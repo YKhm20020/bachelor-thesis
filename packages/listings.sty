@@ -290,7 +290,7 @@
     \lst@Require{aspect}{asp}{#1}\lst@NoAlias\lstaspectfiles}
 \let\lstloadaspects\lst@RequireAspects
 \@ifundefined{lstaspectfiles}
-    {\newcommand\lstaspectfiles{packages/lstmisc0.sty,packages/lstmisc.sty}}{}
+    {\newcommand\lstaspectfiles{lstmisc0.sty,lstmisc.sty}}{}
 \gdef\lst@DefDriver#1#2#3#4{%
     \@ifnextchar[{\lst@DefDriver@{#1}{#2}#3#4}%
                  {\lst@DefDriver@{#1}{#2}#3#4[]}}
@@ -2221,7 +2221,7 @@
   {\def\lst@loadaspects{strings,comments,escape,style,language,%
       keywords,labels,lineshape,frames,emph,index}%
   }{}
-\InputIfFileExists{packages/lstpatch.sty}{}{}
+\InputIfFileExists{lstpatch.sty}{}{}
 \let\lst@ifsavemem\iffalse
 \DeclareOption{savemem}{\let\lst@ifsavemem\iftrue}
 \DeclareOption{noaspects}{\let\lst@loadaspects\@empty}
