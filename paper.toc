@@ -5,7 +5,7 @@
 \contentsline {section}{\numberline {2.2}帳票}{3}{section.2.2}
 \contentsline {section}{\numberline {2.3}OpenCV}{3}{section.2.3}
 \contentsline {section}{\numberline {2.4}Deblur-GANv2}{3}{section.2.4}
-\contentsline {section}{\numberline {2.5}Tesseract-OCR}{3}{section.2.5}
+\contentsline {section}{\numberline {2.5}光学文字認識}{3}{section.2.5}
 \contentsline {section}{\numberline {2.6}Fugashi}{3}{section.2.6}
 \contentsline {section}{\numberline {2.7}Youri}{3}{section.2.7}
 \contentsline {chapter}{\numberline {3}AWSEILの機能}{4}{chapter.3}
