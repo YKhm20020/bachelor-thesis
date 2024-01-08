@@ -1,13 +1,13 @@
-\chapter{\toolName の実装}\label{cha:Implementation}
+\chapter{本ツールの実装}\label{cha:Implementation}
 以下簡単なメモ。修正および加筆予定。
-\toolName は、領域座標取得部、文字情報取得部、ラベル付与部で構成されている。
+本ツールは、領域座標取得部、文字情報取得部、ラベル付与部で構成されている。
 
 
 \section{領域座標取得部}\label{sec:area_coords_obtainment_part}
 領域座標取得部は、帳票画像内の記入欄を検知し、領域座標として出力する。記入欄は、矩形または下線で示しているものを対象する。
 
 
-\subsection{矩形領域座標取得機能}\label{subsec:rect_coords_obtainment}
+\subsection{矩形領域座標取得機能}\label{subsec:rect_coords_obtainment_feature}
 矩形領域座標取得機能では、矩形の記入欄を検知し、各頂点のx, y座標を矩形領域座標として取得し、出力する機能である。まず、以下の順で画像処理を施す。
 
 \begin{enumerate}[label=(\arabic*)]
@@ -27,7 +27,7 @@
 \end{itemize}
 
 
-\subsection{下線部領域座標取得機能}\label{subsec:underline_coords_obtainment}
+\subsection{下線部領域座標取得機能}\label{subsec:underline_coords_obtainment_feature}
 下線部領域取得機能では、下線部の記入欄を検知し、両端点のx, y座標を下線部領域座標として取得し、出力する機能である。まず、以下の順で画像処理を施す。
 
 \begin{enumerate}[label=(\arabic*)]
@@ -54,7 +54,7 @@
 文字情報取得部では、光学文字認識ソフト Tesseract-OCR を用いて、文字と、文字を囲うバウンディングボックスを文字位置として取得する。
 文字情報取得部の出力結果は、後述するラベル付与部で用いる。
 
-\subsection{文字認識機能}\label{subsec:char_recognition}
+\subsection{文字認識機能}\label{subsec:char_recognition_feature}
 文字認識機能では、検出した文字を取得する。取得文字は、後述するラベル付与部の属性推測機能で用いる。まず、以下の順で画像処理を施す。
 
 \begin{enumerate}[label=(\arabic*)]
@@ -65,7 +65,7 @@
 
 画像処理後に、Tesseract-OCR による文字認識を行う。
 
-\subsection{文字位置取得機能}\label{subsec:char_position_obtainment}
+\subsection{文字位置取得機能}\label{subsec:char_position_obtainment_featre}
 文字位置取得機能では、検出した文字を囲うバウンディングボックスの頂点座標を文字位置として取得する。
 前述の文字認識機能における文字認識にて、同時にバウンディングボックスの頂点座標を取得する。
 取得したバウンディングボックスの頂点座標は、後述するラベル付与部のラベル割付機能で用いる。
@@ -75,10 +75,10 @@
 ラベル付与部では、取得した領域に対し、日付、文字列、数値の3つのラベルのいずれかを付与する。
 
 
-\subsection{属性推測機能}\label{subsec:att_prediction}
+\subsection{属性推測機能}\label{subsec:att_prediction_feature}
 属性推測機能では、取得文字に対して、日付、文字列、数値の3つの属性のいずれにあてはまるかを推測する。
 属性の推測には、大規模言語モデル Youri を用いる。
 
-\subsection{ラベル割付機能}\label{subsec:label_link}
+\subsection{ラベル割付機能}\label{subsec:label_link_feature}
 ラベル割付機能では、取得した領域に対し、日付、文字列、数値の3つのラベルのいずれかを割り付ける。
 属性推測機能で推測した属性と、文字位置取得機能で取得したバウンディングボックスの頂点座標をもとに、取得文字近傍の領域に対して、推測した属性を割り付ける。

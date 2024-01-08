@@ -1,8 +1,45 @@
-\chapter{\toolName の機能}\label{cha:Function}
+\chapter{本ツールの機能}\label{cha:Function}
+本章では、本研究で試作した帳票画像内の自動検出ツールの機能について説明する。\\
+本論文において、入力となる帳票画像における記入欄を帳票画像記入欄、本ツールで取得した記入欄を電子フォーム記入欄、文字認識によって得た文字から推測するデータ型を属性、文字の近傍に存在する電子フォーム記入欄に対して、文字位置と属性から割り当てるデータ型をラベルと定義する。\\
+本ツールは、以下の2つの機能を持つ。
+
+\begin{itemize}
+  \item 電子フォーム記入欄取得機能
+  \item 電子フォーム記入欄ラベル付与機能
+\end{itemize}
 
 
+\section{電子フォーム記入欄取得機能}\label{sec:eform_write_space_obtainment_feature}
+電子フォーム記入欄取得機能は、記入欄の対象である矩形領域および下線部領域について各領域座標を電子フォーム記入欄として取得する機能である。
+本機能は、以下の順で処理を施すことにより、電子フォーム記入欄を取得する。
 
-\section{記入欄の領域座標を取得する機能}\label{sec:area_coords_obtainment}
+\begin{enumerate}[label=(\arabic*)]
+  \item 矩形領域取得
+  \item 下線部領域取得
+\end{enumerate}
+
+\subsection{矩形領域取得}\label{subsec:rect_coords_obtainment}
+矩形領域取得は、矩形の領域を帳票画像記入欄とみなし、各頂点のx, y座標を領域座標として取得する。
+
+\subsection{下線部領域取得}\label{subsec:underline_coords_obtainment}
+下線部領域取得は、水平な直線上の領域を帳票画像記入欄とみなし、両端点のx, y座標を領域座標として取得する。
 
 
-\section{記入欄にラベルを付与する機能}\label{sec:label_link}
+\section{電子フォーム記入欄ラベル付与機能}\label{sec:label_link}
+電子フォーム記入欄ラベル付与機能は、電子フォーム記入欄取得機能で取得した領域座標に対して、ラベルを付与する機能である。
+本機能は、以下の順で処理を施すことにより、電子フォーム記入欄にラベルを付与する。
+
+\begin{enumerate}[label=(\arabic*)]
+  \item 文字と文字位置の取得
+  \item 属性推測
+  \item ラベル割付
+\end{enumerate}
+
+\subsection{文字と文字位置の取得}\label{subsec:char_and_bbox_obtainment}
+入力となる帳票画像に対して文字認識を行い、検出した文字と、検出した文字を囲うバウンディングボックスの各頂点の座標を文字位置として取得する。
+
+\subsection{属性推測}\label{subsec:att_prediction}
+検出した文字に対して、大規模言語モデルによる属性の推測を行い、日付、文字列、数値の3つの属性のいずれにあてはまるかを推測する。
+
+\subsection{ラベル割付}\label{subsec:label_link}
+\ref{sec:eform_write_space_obtainment_feature}節で得た領域座標と、\ref{subsec:char_position_obtainment}節で得た文字位置、\ref{subsec:att_prediction}節で得た
