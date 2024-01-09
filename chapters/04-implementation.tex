@@ -1,37 +1,37 @@
-\chapter{本ツールの実装}\label{cha:Implementation}
-以下簡単なメモ。修正および加筆予定。
-本ツールは、領域座標取得部、文字情報取得部、ラベル付与部で構成されている。
+\chapter{本研究の実装}\label{cha:Implementation}
+本研究は、領域座標取得部、文字情報取得部、ラベル付与部で構成する。本章では、3つの処理部について説明する。
 
 
 \section{領域座標取得部}\label{sec:area_coords_obtainment_part}
-領域座標取得部は、帳票画像内の記入欄を検知し、領域座標として出力する。記入欄は、矩形または下線で示しているものを対象する。
+領域座標取得部は、帳票画像内の記入欄を検知し、領域座標として出力する。
+矩形の記入欄については、各頂点のxy座標を、下線の記入欄については、両端点のxy座標を領域座標として取得する。
+領域座標取得部の出力結果は、ラベル付与部(\ref{subsec:label_link_processing}節で後述)で用いる。
 
 
-\subsection{矩形領域座標取得機能}\label{subsec:rect_coords_obtainment_feature}
-矩形領域座標取得機能では、矩形の記入欄を検知し、各頂点のx, y座標を矩形領域座標として取得し、出力する機能である。まず、以下の順で画像処理を施す。
+\subsection{矩形領域座標取得処理}\label{subsec:rect_coords_obtainment_processing}
+矩形領域座標取得処理では、矩形の記入欄を検知し、各頂点のxy座標を矩形領域座標として取得し、出力する処理である。以下の順で画像処理を施す。
 
-\begin{enumerate}[label=(\arabic*)]
+\begin{enumerate}
     \item DeblurGANv2 の適用
     \item 入力画像のグレースケール化
     \item ガウシアンフィルタの適用
     \item 大津法による二値化
-    \item findContours 関数による輪郭検出
 \end{enumerate}
 
-画像処理後、findContours 関数による輪郭検出を用いて矩形領域座標を取得する。
-なお、以下のいずれかにあてはまる矩形については、出力の対象外とする。
+画像処理後、OpenCVのfindContours関数による輪郭検出を用いて矩形領域座標を取得する。
+なお、以下のいずれかに該当する矩形については、出力の対象外とする。
 
 \begin{itemize}
-    \item 面積が3000px以下である場合
-    \item ある辺の長さが10px以下である場合
+    \item 面積が3000ピクセル以下である場合
+    \item ある辺の長さが10ピクセル以下である場合
 \end{itemize}
 
 
-\subsection{下線部領域座標取得機能}\label{subsec:underline_coords_obtainment_feature}
-下線部領域取得機能では、下線部の記入欄を検知し、両端点のx, y座標を下線部領域座標として取得し、出力する機能である。まず、以下の順で画像処理を施す。
+\subsection{下線部領域座標取得処理}\label{subsec:underline_coords_obtainment_processing}
+下線部領域座標取得処理では、下線部の記入欄を検知し、両端点のxy座標を下線部領域座標として取得し、出力する処理である。まず、以下の順で画像処理を施す。
 
-\begin{enumerate}[label=(\arabic*)]
-    \item DeblurGANv2 の適用
+\begin{enumerate}
+    \item DeblurGANv2の適用
     \item 入力画像のグレースケール化
     \item ガウシアンフィルタの適用
     \item 大津法による二値化
@@ -39,46 +39,79 @@
     \item Canny 法によるエッジ検出
 \end{enumerate}
 
-以上の画像処理を施した後に、ハフ変換を用いて直線を両端点のx, y座標を取得する。
+画像処理後、OpenCVのHoughLinesP関数によるハフ変換を用いて直線を両端点のxy座標を取得する。
 なお、以下のいずれかに該当する直線については、出力の対象外とする。
 
 \begin{itemize}
-    \item 直線の長さが10px未満である場合
-    \item 傾きが3px以上である場合
+    \item 直線の長さが10ピクセル未満である場合
+    \item 水平を基準として傾きが3ピクセル以上である場合
     \item 矩形領域の辺の一部である場合
 \end{itemize}
+
+エッジ検出を施すことにより、直線の検出精度が向上するが、直線の上下に2本の直線を検出してしまう不具合が発生する。
+この不具合については、検出した直線の中点を全て計算し、ある直線における中点のy座標がについて、上下10ピクセル以内に別の直線の中点が存在する場合は、二直線の両端点について、それぞれxy座標を平均したものに更新して一本の直線に統一することによって不具合を解消する。
 
 
 
 \section{文字情報取得部}\label{sec:OCR_part}
 文字情報取得部では、光学文字認識ソフト Tesseract-OCR を用いて、文字と、文字を囲うバウンディングボックスを文字位置として取得する。
-文字情報取得部の出力結果は、後述するラベル付与部で用いる。
+文字情報取得部の出力結果は、ラベル付与部(\ref{subsec:label_link_processing}節で後述)で用いる。
 
-\subsection{文字認識機能}\label{subsec:char_recognition_feature}
-文字認識機能では、検出した文字を取得する。取得文字は、後述するラベル付与部の属性推測機能で用いる。まず、以下の順で画像処理を施す。
+\subsection{文字認識処理}\label{subsec:char_recognition_processing}
+文字認識処理では、検出した文字を取得文字として取得する。以下の順で画像処理を施す。
 
-\begin{enumerate}[label=(\arabic*)]
-    \item DeblurGANv2 の適用
+\begin{enumerate}
+    \item DeblurGANv2の適用
     \item 入力画像のグレースケール化
     \item 大津法による二値化
 \end{enumerate}
 
-画像処理後に、Tesseract-OCR による文字認識を行う。
+画像処理後に、Tesseract-OCRによる文字認識を行う。
 
-\subsection{文字位置取得機能}\label{subsec:char_position_obtainment_featre}
-文字位置取得機能では、検出した文字を囲うバウンディングボックスの頂点座標を文字位置として取得する。
-前述の文字認識機能における文字認識にて、同時にバウンディングボックスの頂点座標を取得する。
-取得したバウンディングボックスの頂点座標は、後述するラベル付与部のラベル割付機能で用いる。
+\subsection{文字位置取得処理}\label{subsec:char_position_obtainment_processing}
+文字位置取得処理では、検出した文字を囲うバウンディングボックスの頂点座標を文字位置として取得する。
+\ref{subsec:char_recognition_processing}節の文字認識処理における文字認識と同時に、バウンディングボックスの頂点座標を取得する。
+
+文字位置を取得後、バウンディングボックスの左上の頂点座標について、y座標が小さい順に、\ref{subsec:char_recognition_processing}節で取得した文字と組とし、番号を割り振る。y座標が同じ場合は、さらにx座標が小さい順にソートする。
+しかし、複数の文字列が同じ行に存在する、すなわちy座標が同じ文字列が複数存在する際に、左右の順番がバラバラとなる場合がある。
+これは、Tesseract-OCRが検出する順番はy座標をピクセル単位でソートしたものであり、人間が目視で同じ行と認識する文字列が、y座標がピクセル単位で異なり、目視の順番とソートの順番が入れ替わるためである。
+\ref{subsec:label_link_processing}節のラベル付与部で文字位置を扱う際に、目視で同行と判別する文字列間で左から順に並んでいない場合は、ラベルの更新順が変化してしまう。
+検出順番の変化することを防ぐため、ソートで比較する値は、y座標を10分の1した値を用いてソートを行う。
+
+
+\subsection{除外判定処理}\label{subsec:exclusion_judgement_processing}
+除外判定処理では、Fugashiによる形態素解析を行い、属性判定処理(\ref{subsec:att_prediction_processing}で後述)に不要である取得文字について、出力から除外する。
+形態素の品詞を解析し、検出した文字列の構成形態素数のうち、特定の品詞である形態素数の割合が半分以上である場合は、属性判定において意味を成さない取得文字であるとし、該当の取得文字と文字位置を出力の対象外としている。
+文字を認識する際に、紙面と背景の境界や、矩形や直線を文字として誤認識する場合がある。
+不要な推測を防ぐことにより、処理時間を短縮することが可能である。
+除外の対象となる形態素の品詞を、UniDic品詞体系をもとに以下に示す。
+
+\begin{itemize}
+    \item 補助記号,一般,*,*
+    \item 感動詞,フィラー,*,*
+\end{itemize}
 
 
 \section{ラベル付与部}\label{sec:label_link_part}
 ラベル付与部では、取得した領域に対し、日付、文字列、数値の3つのラベルのいずれかを付与する。
+領域座標と、領域座標に対応するラベルを組としたJSON形式のファイルを出力とする。
 
 
-\subsection{属性推測機能}\label{subsec:att_prediction_feature}
-属性推測機能では、取得文字に対して、日付、文字列、数値の3つの属性のいずれにあてはまるかを推測する。
-属性の推測には、大規模言語モデル Youri を用いる。
+\subsection{属性推測処理}\label{subsec:att_prediction_processing}
+属性推測処理では、取得文字に対して、日付、文字列、数値の3つの属性のいずれに該当するかを推測する。属性が判別不可である取得文字は、文字列として属性を推測する。
+属性の推測には、大規模言語モデルYouriを用いる。YouriはLlama2を日本語の学習データで継続事前学習を行った大規模言語モデルである。日本語の推論に特化したモデルを利用することで、\ref{subsec:char_recognition_processing}節で取得した日本語の文字に属性をより正確に判別することが可能となる。以下のプロンプトを入力とする。\\
 
-\subsection{ラベル割付機能}\label{subsec:label_link_feature}
-ラベル割付機能では、取得した領域に対し、日付、文字列、数値の3つのラベルのいずれかを割り付ける。
-属性推測機能で推測した属性と、文字位置取得機能で取得したバウンディングボックスの頂点座標をもとに、取得文字近傍の領域に対して、推測した属性を割り付ける。
+書類の項目として、（取得文字）は、という欄に記入する内容がどのデータ型に該当するかを、日付、文字列、数値の中から最も適切なものを選べ。
+
+\subsection{ラベル割付処理}\label{subsec:label_link_processing}
+ラベル割付処理では、\ref{sec:area_coords_obtainment_part}節で取得した領域座標について、近傍に存在する文字の属性を割り付ける。
+\ref{subsec:att_prediction_processing}節で推測した属性と、\ref{subsec:char_position_obtainment_processing}節で取得した文字位置をもとに、取得文字近傍の領域座標に対して、推測した属性を割り付ける。
+ラベルを割り付ける流れを以下に示す。以下の処理は、\ref{subsec:char_position_obtainment_processing}節でソートを行った順番で、文字を検出した回数だけ繰り返す。
+
+\begin{enumerate}
+    \item 文字位置であるバウンディングボックスの中心点のxy座標を計算する。
+    \item 取得した領域座標のうち、右下の頂点座標のxy座標が計算した中心点のxy座標よりも共に大きい場合は、文字位置に対応する取得文字の属性を割り付ける。
+    \item 領域座標に既にラベルが割り付けてある場合は、ラベルを更新する。
+\end{enumerate}
+
+以上の繰り返し処理が完了後、\ref{sec:area_coords_obtainment_part}節で取得した領域座標と、領域座標に対応するラベルを組とした電子フォーム記入欄として、JSON形式で出力する。
