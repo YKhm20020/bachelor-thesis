@@ -19,33 +19,21 @@
 なお、入力対象とする画像の座標系は、画像左上隅画素を原点(0,0)とし、右方向をX軸の正の向き、下方向をY軸の正の向きと定義する。
 
 \section{バリデーションチェック}\label{sec:validation_check}
-バリデーションチェックは、フォーム入力における意味として、ユーザー入力の正確性と完全性を検証するものである\cite{バリデーションチェック}。
 
 
 \section{OpenCV}\label{sec:OpenCV}
-OpenCV(Open Source Computer Vision Library) は、コンピュータビジョン向けのオープンソースライブラリである\cite{OpenCV}。
-本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節)における画像処理と領域の検出に、文字情報取得部(\ref{sec:OCR_part}節)における画像処理に用いる。
-具体的には、輪郭検出を行うfindContours関数やハフ変換を行うHoughLinesP関数などの関数を用いる。
+
 
 
 \section{DeblurGANv2}\label{sec:Deblur-GANv2}
-DeblurGANv2は、敵対的生成ネットワーク(GAN)をぼかし除去に適用したものである\cite{DeblurGANv2}。
-スマートフォンのカメラで撮影した画像に対してDeblurGANv2を適用することで、ブレ除去による画像品質が向上し、生成した画像を入力に複数の画像処理を施すことで、Tesseract-OCRを用いた文字認識の精度が向上することが先行研究で示されている\cite{DeblurGANv2の先行研究}。
-本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節)と文字情報取得部(\ref{sec:OCR_part}節)で施す画像処理のひとつとして用いる。
+
 
 
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
-光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字コードに変換することである\cite{光学文字認識}。
-本研究では、光学文字認識ソフトであるTesseract-OCRを用いて、文字と、文字を囲うバウンディングボックスの各頂点のxy座標を取得するために用いる。
 
 
 \section{Fugashi}\label{sec:Fugashi}
-Fugashiは、形態素解析ソフトウェアであるMecabをPythonで使用する際のラッパーライブラリである\cite{Fugashi}。
-本研究では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節)で属性判定に不要な取得文字を出力の対象外とするために用いる。
-また、本研究ではFugashiの解析に用いる辞書はUniDicであるため、以降で記述する品詞体系についてはUniDic品詞体系とする。
-UniDic品詞体系では、左からカンマ区切りで、大分類、中分類、小分類、細分類の順で列挙する\cite{UniDic品詞体系}。
+
 
 
 \section{Youri}\label{sec:Youri}
-Youriは、Llama2を日本語の学習データで継続事前学習を行った、日本語のテキスト生成能力を高めた大規模言語モデルである\cite{Youri}。
-本研究では、属性推測処理(\ref{subsec:att_prediction_processing}節)で取得文字の属性を判定するために用いる。
