@@ -43,9 +43,9 @@
 
 \begin{enumerate}
     \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化\\
-        \ref{subsec:rect_coords_obtainment_processing}節と同様
+        \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
     \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
-        \ref{subsec:rect_coords_obtainment_processing}節と同様
+        \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
     \item OpenCVのthreshold関数を用いた、大津の二値化による二値画像への変換\\
         本提案手法では、二値化手法を大津の二値化の閾値処理によるTHRESH\_BINARYとする。
     \item Canny 法によるエッジ検出\\
@@ -83,18 +83,20 @@
 文字の取得にあたり、文字の認識精度を高めるため、以下の順で帳票画像に画像処理を施す。
 
 \begin{enumerate}
-    \item DeblurGANv2の適用
-    \item 入力画像のグレースケール化
-    \item 大津法による二値化
+    \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
+        \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
+    \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化\\
+        \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
+    \item OpenCVのthreshold関数を用いた、大津の二値化による二値画像への変換\\
 \end{enumerate}
 
-画像処理後に、Tesseract-OCRによる文字認識を行う。
+画像処理後、Tesseract-OCRによる文字認識を行う。
 
 \subsection{文字位置取得処理}\label{subsec:char_position_obtainment_processing}
 文字位置取得処理では、認識した文字を囲うバウンディングボックスの頂点座標を文字位置として取得する。
-\ref{subsec:char_recognition_processing}節の文字認識処理における文字認識と同時に、バウンディングボックスの頂点座標を取得する。
+\ref{subsec:char_recognition_processing}節の文字認識処理と同時に、文字位置を取得する。
 
-文字位置を取得後、バウンディングボックスの左上の頂点座標について、y座標が小さい順に、\ref{subsec:char_recognition_processing}節で取得した文字と組とし、番号を割り振る。y座標が同じ場合は、さらにx座標が小さい順にソートする。
+文字位置取得後、バウンディングボックスの左上の頂点座標について、y座標の値が小さい順に\ref{subsec:char_recognition_processing}節で取得した文字と組とし、番号を割り振る。y座標が同じ場合は、さらにx座標が小さい順にソートする。
 しかし、複数の文字列が同じ行に存在する、すなわちy座標が同じ文字列が複数存在する際に、左右の順番がバラバラと場合がある。
 これは、Tesseract-OCRが文字を認識する順番について、y座標をピクセル単位でソートするため、人間の目視による認識とソートの順番に違いが生じるためである。
 \ref{subsec:label_link_processing}節のラベル付与部で文字位置を扱う際に、この認識とソート結果の齟齬が生じてしまう場合、ラベルの更新順が変化してしまうため、意図しないラベルを領域座標に割り付ける不具合が発生する可能性がある。
@@ -115,7 +117,8 @@
 
 
 \section{ラベル付与部}\label{sec:label_link_part}
-ラベル付与部では、取得した領域に対し、日付、文字列、数値の3つのラベルのいずれかを付与する。
+ラベル付与部では、\ref{subsec:char_recognition_processing}で取得した文字の属性を日付、文字列、数値の3つから適当なものを推測し、取得した領域にラベルとして付与する。
+付与するラベルの種類は、領域近傍の取得文字から推測する属性に依存する。
 領域座標と、領域座標に対応するラベルを組としたJSON形式のファイルを出力とする。
 
 
@@ -128,12 +131,12 @@
 \subsection{ラベル割付処理}\label{subsec:label_link_processing}
 ラベル割付処理では、\ref{sec:area_coords_obtainment_part}節で取得した領域座標について、近傍に存在する文字の属性を割り付ける。
 \ref{subsec:att_prediction_processing}節で推測した属性と、\ref{subsec:char_position_obtainment_processing}節で取得した文字位置をもとに、取得文字近傍の領域座標に対して、推測した属性を割り付ける。
-ラベルを割り付ける流れを以下に示す。以下の処理は、\ref{subsec:char_position_obtainment_processing}節でソートを行った順番で、文字を検出した回数だけ繰り返す。
+領域座標にラベルを割り付ける流れを以下に示す。以下の処理は、\ref{subsec:char_position_obtainment_processing}節でソートを行った順番で、文字を検出した回数だけ繰り返す。
 
 \begin{enumerate}
     \item 文字位置であるバウンディングボックスの中心点のxy座標を計算する。
     \item 取得した領域座標のうち、右下の頂点座標のxy座標が計算した中心点のxy座標よりも共に大きい場合は、文字位置に対応する取得文字の属性を割り付ける。
-    \item 既にラベルが割り付けた領域座標については、ラベルを更新する。
+    \item 既にラベルを割り付けた領域座標については、ラベルを更新する。
 \end{enumerate}
 
-以上の繰り返し処理が完了後、\ref{sec:area_coords_obtainment_part}節で取得した領域座標と、領域座標に対応するラベルを組をJSON形式で出力する。
+以上の繰り返し処理後、\ref{sec:area_coords_obtainment_part}節で取得した領域座標と、領域座標に対応するラベルの組をJSON形式で出力する。
