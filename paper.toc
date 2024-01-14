@@ -28,12 +28,12 @@
 \contentsline {subsection}{\numberline {4.1.1}矩形領域座標取得処理}{10}{subsection.4.1.1}
 \contentsline {subsection}{\numberline {4.1.2}下線部領域座標取得処理}{11}{subsection.4.1.2}
 \contentsline {section}{\numberline {4.2}文字情報取得部}{12}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}文字認識処理}{13}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.1}文字認識処理}{12}{subsection.4.2.1}
 \contentsline {subsection}{\numberline {4.2.2}文字位置取得処理}{13}{subsection.4.2.2}
 \contentsline {subsection}{\numberline {4.2.3}除外判定処理}{13}{subsection.4.2.3}
 \contentsline {section}{\numberline {4.3}ラベル付与部}{14}{section.4.3}
 \contentsline {subsection}{\numberline {4.3.1}属性推測処理}{14}{subsection.4.3.1}
-\contentsline {subsection}{\numberline {4.3.2}ラベル割付処理}{14}{subsection.4.3.2}
+\contentsline {subsection}{\numberline {4.3.2}ラベル割付処理}{15}{subsection.4.3.2}
 \contentsline {chapter}{\numberline {5}適用例}{16}{chapter.5}
 \contentsline {section}{\numberline {5.1}領域座標取得部の動作結果}{16}{section.5.1}
 \contentsline {subsection}{\numberline {5.1.1}矩形領域座標の取得結果}{16}{subsection.5.1.1}

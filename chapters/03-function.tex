@@ -42,7 +42,7 @@
 入力である帳票画像に対して文字認識を行い、検出した文字と、検出した文字を囲うバウンディングボックスの各頂点の座標をそれぞれ取得文字、文字位置として取得する。
 
 \subsection{属性推測}\label{subsec:att_prediction}
-取得文字に対して、大規模言語モデルによる属性の推測を行い、日付、文字列、数値の3つのいずれに該当するかを推測し、属性として得る。
+取得文字に対して、大規模言語モデルによる属性の推測を行い、日付(date)、文字列(string)、数値(number)の3つのいずれに該当するかを推測し、属性として得る。
 
 \subsection{ラベル割付}\label{subsec:label_link}
 \ref{sec:eform_write_space_obtainment_feature}節で得た領域座標と、\ref{subsec:char_and_bbox_obtainment}節で得た文字位置、\ref{subsec:att_prediction}節で得た属性を用いる。
