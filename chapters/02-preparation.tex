@@ -48,13 +48,15 @@ OpenCVでは、threshold関数の引数を指定することにより、二値�
 下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で設定するTHRESH\_BINARY\_INVで大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を0に、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
 なお、一般に8ビット画像について、画素値は0に近づくほど黒を、255に近づくほど白を表すとされている\cite{画素値}。
 
-\paragraph{findContours関数}
-findContours関数は、画像内にある物体の輪郭を検出する関数である。
-本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で矩形の輪郭を検出するために用いる。
+\paragraph{getStructuringElement関数}
+getStructuringElement関数は、カーネルを作成する関数である。
+第一引数でカーネルの形状を矩形、楕円、十字から決定することが可能である。
+第二引数でカーネルの大きさを指定することが可能であり、
 
-\paragraph{HoughLinesP関数}
-HoughLinesP関数は、画像内にある直線を検出する関数である。
-本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で直線を検出するために用いる。
+\paragraph{dilate関数}
+dilate関数は、画像に膨張処理を施す関数である。
+膨張処理は、ある注目画素について、一定周囲の画素集合内に白色に二値化した画素がある場合は、注目画素の画素値をカーネル内画素の最大画素値に変更する処理である\cite{膨張処理}。
+本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で施す画像処理のひとつとして用いる。
 
 \paragraph{Canny関数}
 Canny関数は、Canny法によってエッジ検出を行う関数である。
@@ -63,6 +65,13 @@ Canny法は、ガウシアンフィルタでノイズを除去し、ソーベル
 Canny法におけるエッジ検出の閾値処理については、最低閾値と最大閾値を決め、画素値の微分値が最大閾値よりも大きい画素と、それらに隣接しており、かつ最低閾値よりも大きく最大閾値よりも小さい画素のみをエッジとみなすヒステリシス閾値処理を用いる\cite{Canny法}。
 本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で下線部領域座標の取得に必要な画像処理の一部として用いる。
 
+\paragraph{findContours関数}
+findContours関数は、画像内にある物体の輪郭を検出する関数である。
+本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で矩形の輪郭を検出するために用いる。
+
+\paragraph{HoughLinesP関数}
+HoughLinesP関数は、画像内にある直線を検出する関数である。
+本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で直線を検出するために用いる。
 
 \section{DeblurGANv2}\label{sec:DeblurGANv2}
 DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用したツールである\cite{DeblurGANv2}。
