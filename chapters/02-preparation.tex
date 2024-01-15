@@ -7,7 +7,7 @@
 \section{入力対象の画像}\label{sec:input_images}
 本提案手法の入力対象である画像については、以下の条件を全て満たす画像とする。
 なお、帳票は帳簿と伝票の総称であり\cite{帳票}、電子文書は、Wordやテキストファイルなど、デジタル情報として作成した文書を指し、電子化文書は紙媒体の書類をスキャンしたPDFファイルや画像などとして保存した文書を指す\cite{電子文書と電子化文書}。
-電子化文書画像については、本提案手法においては、スマートフォンのカメラで撮影した帳票の画像を想定している。
+電子化文書画像については、本提案手法においては、スマートフォンのカメラで撮影した帳票の画像を想定する。
 
 \begin{itemize}
   \item 帳票の電子文書または電子化文書の画像である。
@@ -23,42 +23,48 @@
 
 \section{OpenCV}\label{sec:OpenCV}
 OpenCV(Open Source Computer Vision Library) は、コンピュータビジョン向けのオープンソースライブラリである\cite{OpenCV}。
-本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節)における画像処理と領域の検出、文字情報取得部(\ref{sec:OCR_part}節)における画像処理に用いる。
-具体的には、画像を読み込むimread関数、輪郭検出を行うfindContours関数やハフ変換を行うHoughLinesP関数などの関数を用いる。
+本研究では、OpenCVに用意されている以下の関数を用いる。
 
 \paragraph{imread関数}
 imread関数は、画像ファイルを読み込む関数である。
 
 \paragraph{cvtColor関数}
 cvtColor関数は、画像の色空間を変換する関数である。
-本研究では、画像をグレースケール化するために用いる。
+本研究では、読み込んだ画像をグレースケール化するために用いる。
 
 \paragraph{GaussianBlur関数}
-GaussianBlur関数は、画像内の白色ノイズを除去する関数である。
+GaussianBlur関数は、ガウシアンフィルタを適用することにより、画像内の白色ノイズを除去する関数である。
 ガウシアンフィルタは、注目画素との距離に応じて重みを変えるガウシアンカーネルを用いた、画像の平滑化によって白色ノイズを除去するフィルタである。
 標準偏差を0とすることで、カーネルの大きさから自動的に標準偏差を計算する\cite{ガウシアンフィルタ}。
+本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)に必要な画像処理の一部として用いる。
 
 \paragraph{threshold関数}
-threshold関数は、画像を二値化する関数である。OpenCVでは、threshold関数の引数を指定することにより、二値化における閾値処理手法を選択することが可能である。
-本提案手法では、THRESH\_TOZERO\_INVとTHRESH\_BINARYを、大津の二値化による閾値処理であるTHRESH\_OTSUを設定して二値化を行う。
+threshold関数は、画像を二値化する関数である。
+OpenCVでは、threshold関数の引数を指定することにより、二値化における閾値処理手法を選択することが可能である。
+本研究では、THRESH\_TOZERO\_INVとTHRESH\_BINARYを、大津の二値化による閾値処理であるTHRESH\_OTSUと共に設定して二値化を行う。
 大津の二値化(判別分析法)は、画素値のヒストグラムにおけるクラス間分散とクラス内分散の比である分離度が最大となる閾値を求める手法である\cite{大津の二値化}。
-大津の二値化を用いることによって、閾値を自動で決定することが可能である。
-THRESH\_TOZERO\_INVで大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は変更せず、閾値よりも大きい場合は第三引数で設定する値に画素値を変換して二値化する。
-THRESH\_BINARY\_INVで大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は0に、閾値よりも大きい場合は第三引数で設定する値に画素値を変換して二値化する。
+大津の二値化を用いることによって、画像に適する閾値を自動で決定することが可能である。
+矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で設定するTHRESH\_TOZERO\_INVで大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を変換せず、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
+下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で設定するTHRESH\_BINARY\_INVで大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を0に、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
 なお、一般に8ビット画像について、画素値は0に近づくほど黒を、255に近づくほど白を表すとされている\cite{画素値}。
 
 \paragraph{findContours関数}
+findContours関数は、画像内にある物体の輪郭を検出する関数である。
+本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で矩形の輪郭を検出するために用いる。
 
 \paragraph{HoughLinesP関数}
+HoughLinesP関数は、画像内にある直線を検出する関数である。
+本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で直線を検出するために用いる。
 
 \paragraph{Canny関数}
 Canny関数は、Canny法によってエッジ検出を行う関数である。
 エッジ検出は、画像内の輝度差を検出することにより、物体や領域の境界を識別する処理である\cite{エッジ検出}。
 Canny法は、ガウシアンフィルタでノイズを除去し、ソーベルフィルタでエッジの勾配と方向を検出し、エッジを細線化した後に勾配と方向からエッジ検出を行う手法である。
-Canny法におけるエッジ検出の閾値処理については、最低閾値と最大閾値を決め、画素値の微分値が最大閾値よりも大きい画素と、それらに隣接しており、かつ最低閾値よりも大きく最大閾値よりも小さい画素のみをエッジとみなすヒステリシス閾値処理を用いる。
+Canny法におけるエッジ検出の閾値処理については、最低閾値と最大閾値を決め、画素値の微分値が最大閾値よりも大きい画素と、それらに隣接しており、かつ最低閾値よりも大きく最大閾値よりも小さい画素のみをエッジとみなすヒステリシス閾値処理を用いる\cite{Canny法}。
+本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で下線部領域座標の取得に必要な画像処理の一部として用いる。
 
 
-\section{DeblurGANv2}\label{sec:Deblur-GANv2}
+\section{DeblurGANv2}\label{sec:DeblurGANv2}
 DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用したツールである\cite{DeblurGANv2}。
 スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
 また、スマートフォンのカメラで撮影した画像に対して複数の画像処理と共にDeblurGANv2を適用することで、ブレ除去によって画像品質が向上し、Tesseract-OCRを用いた文字認識の精度が向上することが先行研究で示されている\cite{DeblurGANv2の先行研究}。
@@ -66,11 +72,12 @@ DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用�
 
 
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
-
+光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字コードに変換することである\cite{光学文字認識}。
+本研究では、文字認識処理(\ref{subsec:char_recognition_processing}節)および文字位置取得処理(\ref{subsec:char_position_obtainment_processing}節)で光学文字認識ソフトであるTesseract-OCRを用いて、文字と、文字を囲うバウンディングボックスの各頂点のxy座標を取得するために用いる。
 
 \section{Fugashi}\label{sec:Fugashi}
 Fugashiは、形態素解析ソフトウェアであるMecabをPythonで使用する際のラッパーライブラリである\cite{Fugashi}。
-本研究では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節)で属性判定に不要な取得文字を出力の対象外とするために用いる。
+本研究では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節)で属性判定に不要な取得文字を、構成する形態素の品詞を参照し、出力の対象外とするために用いる。
 また、本研究ではFugashiの解析に用いる辞書はUniDicであるため、本論文で記述する品詞体系についてはUniDic品詞体系とする。
 UniDic品詞体系では、左からカンマ区切りで、大分類、中分類、小分類、細分類の順で品詞を列挙する\cite{UniDic品詞体系}。
 
