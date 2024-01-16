@@ -6,17 +6,17 @@
 \contentsline {section}{\numberline {2.3}OpenCV}{4}{section.2.3}
 \contentsline {paragraph}{imread関数}{4}{section*.2}
 \contentsline {paragraph}{cvtColor関数}{4}{section*.3}
-\contentsline {paragraph}{GaussianBlur関数}{4}{section*.4}
-\contentsline {paragraph}{threshold関数}{4}{section*.5}
-\contentsline {paragraph}{getStructuringElement関数}{5}{section*.6}
+\contentsline {paragraph}{getStructuringElement関数}{4}{section*.4}
+\contentsline {paragraph}{GaussianBlur関数}{4}{section*.5}
+\contentsline {paragraph}{threshold関数}{4}{section*.6}
 \contentsline {paragraph}{dilate関数}{5}{section*.7}
 \contentsline {paragraph}{Canny関数}{5}{section*.8}
-\contentsline {paragraph}{findContours関数}{5}{section*.9}
-\contentsline {paragraph}{HoughLinesP関数}{5}{section*.10}
+\contentsline {paragraph}{findContours関数}{6}{section*.9}
+\contentsline {paragraph}{HoughLinesP関数}{6}{section*.10}
 \contentsline {section}{\numberline {2.4}DeblurGANv2}{6}{section.2.4}
 \contentsline {section}{\numberline {2.5}光学文字認識}{6}{section.2.5}
 \contentsline {section}{\numberline {2.6}Fugashi}{6}{section.2.6}
-\contentsline {section}{\numberline {2.7}Youri}{6}{section.2.7}
+\contentsline {section}{\numberline {2.7}Youri}{7}{section.2.7}
 \contentsline {chapter}{\numberline {3}本提案手法の機能}{8}{chapter.3}
 \contentsline {section}{\numberline {3.1}電子フォーム記入欄取得機能}{8}{section.3.1}
 \contentsline {subsection}{\numberline {3.1.1}矩形領域取得}{9}{subsection.3.1.1}
@@ -30,11 +30,11 @@
 \contentsline {subsection}{\numberline {4.1.1}矩形領域座標取得処理}{11}{subsection.4.1.1}
 \contentsline {subsection}{\numberline {4.1.2}下線部領域座標取得処理}{13}{subsection.4.1.2}
 \contentsline {section}{\numberline {4.2}文字情報取得部}{15}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}文字認識処理}{15}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.1}文字認識処理}{16}{subsection.4.2.1}
 \contentsline {subsection}{\numberline {4.2.2}文字位置取得処理}{16}{subsection.4.2.2}
 \contentsline {subsection}{\numberline {4.2.3}除外判定処理}{17}{subsection.4.2.3}
 \contentsline {section}{\numberline {4.3}ラベル付与部}{18}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}属性推測処理}{18}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.1}属性推測処理}{19}{subsection.4.3.1}
 \contentsline {subsection}{\numberline {4.3.2}ラベル割付処理}{20}{subsection.4.3.2}
 \contentsline {chapter}{\numberline {5}適用例}{21}{chapter.5}
 \contentsline {section}{\numberline {5.1}領域座標取得部の動作結果}{21}{section.5.1}
