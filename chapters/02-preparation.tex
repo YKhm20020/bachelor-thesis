@@ -36,7 +36,7 @@ cvtColor関数は、画像の色空間を変換する関数である。
 \paragraph{getStructuringElement関数}
 getStructuringElement関数は、カーネルを作成する関数である。
 ガウシアンフィルタ(GaussianBlur関数で後述)や膨張処理(dilate関数で後述)など、注目画素の周囲の画素値を参照し、処理ごとに必要な計算を行う画像処理がある。
-カーネルは、周囲の画素を行列として、参照する計算に付ける重みである。
+カーネルは、周囲の画素を行列として、周囲の画素を参照する計算に付ける重みである。
 例えば、3行3列のカーネルは、注目画素とその周囲8画素の画素値の、計9画素の画素値を用いて計算を行う。
 第一引数として、カーネルの形状を矩形、楕円、十字から決定する。
 また、第二引数では、カーネルの大きさを指定する。
@@ -52,7 +52,7 @@ threshold関数は、画像を二値化する関数である。
 第一引数として、グレースケール画像を指定する。
 また、第二引数では、二値化する際の閾値を指定し、第三引数では、二値化後の画素値の最大値を指定する。
 さらに、第四引数では、二値化における閾値処理手法を指定する。
-本研究では、閾値処理手法を指定する定数であるTHRESH\_TOZERO\_INVとTHRESH\_BINARYを、大津の二値化による閾値処理を設定する定数であるTHRESH\_OTSUと共に第四引数に設定して二値化を行う。
+本研究では、閾値処理手法を指定する変数であるTHRESH\_TOZERO\_INVとTHRESH\_BINARYを、大津の二値化による閾値処理を設定する変数であるTHRESH\_OTSUと共に第四引数に設定して二値化を行う。
 大津の二値化(判別分析法)は、画素値のヒストグラムにおけるクラス間分散とクラス内分散の比である分離度が最大となる閾値を求める手法である\cite{大津の二値化}。
 大津の二値化を用いることによって、画像に適する閾値を自動で決定することができる。
 矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で設定するTHRESH\_TOZERO\_INVで大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を変換せず、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
@@ -89,7 +89,7 @@ DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用�
 
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
 光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字コードに変換することである\cite{光学文字認識}。
-本研究では、文字認識処理(\ref{subsec:char_recognition_processing}節)および文字位置取得処理(\ref{subsec:char_position_obtainment_processing}節)で光学文字認識ソフトであるTesseract-OCRを用いて、文字と、文字を囲うバウンディングボックスの各頂点のxy座標を取得するために用いる。
+本研究では、文字認識処理(\ref{subsec:char_recognition_processing}節)および文字位置取得処理(\ref{subsec:char_position_obtainment_processing}節)で光学文字認識ソフトであるTesseract-OCRを用いて、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
 
 \section{Fugashi}\label{sec:Fugashi}
 Fugashiは、形態素解析ソフトウェアであるMecabをPythonで使用する際のラッパーライブラリである\cite{Fugashi}。
@@ -99,5 +99,5 @@ UniDic品詞体系では、左からカンマ区切りで、大分類、中分�
 
 
 \section{Youri}\label{sec:Youri}
-Youriは、Llama2を日本語の学習データで継続事前学習を行った、日本語のテキスト生成能力を高めた大規模言語モデルである\cite{Youri}。
+Youriは、Llama2を日本語の学習データで継続事前学習を行うことによって、日本語のテキスト生成能力を高めた大規模言語モデルである\cite{Youri}。
 本研究では、属性推測処理(\ref{subsec:att_prediction_processing}節)で取得文字の属性を判定するために用いる。
