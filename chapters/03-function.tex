@@ -3,8 +3,6 @@
 
 本研究では、帳票画像内の記入欄である領域の座標を取得後、文字の属性を判定し、取得文字近傍に存在する記入欄の座標に対してラベルを割り当て、領域の座標と、対応するラベルを組とするJSON形式のファイルを出力する手法を提案する。
 本提案手法は、\ref{sec:input_images}節で述べた帳票画像を入力とする。出力は、領域の座標と、対応するラベルを組とするJSON形式のファイルである。
-また、本提案手法の各処理結果を確認しやすくするため、処理結果をコンソールと、入力である帳票画像に反映したJPEG形式の確認用出力画像を同時に出力する。
-コンソールに表示する内容と確認用出力画像の詳細については、各処理で説明する。
 なお、本研究において、以下の名称を用いる。
 
 \begin{itemize}
@@ -25,6 +23,16 @@
   \item 電子フォーム記入欄ラベル付与機能
 \end{itemize}
 
+なお、以下に示す帳票画像を図\ref{fig:original}元画像として、各機能の説明を行う。
+
+\begin{figure}[t]
+  \begin{center}
+      \includegraphics[width=15cm]{image/03-function/original.jpg}
+      \caption{元画像}
+      \label{fig:original}
+  \end{center}
+\end{figure}
+
 
 \section{電子フォーム記入欄取得機能}\label{sec:eform_write_space_obtainment_feature}
 電子フォーム記入欄取得機能では、取得対象の記入欄である矩形領域および下線部領域について各領域座標を電子フォーム記入欄として取得する。
@@ -38,16 +46,56 @@
 
 \subsection{矩形領域取得}\label{subsec:rect_coords_obtainment}
 矩形領域取得は、矩形の領域を帳票画像記入欄とみなし、各頂点のxy座標を領域座標として取得する。
-この処理では、確認用出力画像として、領域座標を参照してランダムなRGBカラーで色を付けた矩形を描画し、同色で矩形左上隅に番号を表示した画像を出力する。
-矩形左上隅に表示する番号は、矩形の全領域座標について、左上頂点のy座標を昇順にソートしたものに、0から昇順に番号をつける。
-左上頂点のy座標が同じ領域座標が複数存在する場合は、さらに左上頂点のx座標を昇順にソートしている。
-コンソールには、矩形の番号と各頂点のxy座標を出力する。
-コンソールに表示する矩形の番号と、確認用出力画像に表示する番号は一致する。
+
+図\ref{fig:original}内にある帳票画像記入欄の一部を切り取った画像を、図\ref{fig:rect_original}に示す。
+また、図\ref{fig:rect_original}の元画像に対し、矩形の領域座標を取得し、描画した画像を、図\ref{fig:rect_drawing}に示す。
+図\ref{fig:rect_drawing}の画像は、JSON形式のファイルでの出力を確認するため、矩形領域座標を参照してランダムなRGBカラーで矩形を描画し、同色で矩形左上隅に番号を表示している。
+図\ref{fig:rect_drawing}の矩形に表示する番号は、JSON形式のファイルにある番号と一致する。
+
+\begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=15cm]{image/03-function/rect_original.jpg}
+        \caption{帳票画像にある矩形の記入欄}
+        \label{fig:rect_original}
+    \end{center}
+\end{figure}
+
+\begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=15cm]{image/03-function/rect_drawing.jpg}
+        \caption{取得した矩形領域座標の描画}
+        \label{fig:rect_drawing}
+    \end{center}
+\end{figure}
 
 
 
 \subsection{下線部領域取得}\label{subsec:underline_coords_obtainment}
 下線部領域取得は、水平な直線上の領域を帳票画像記入欄とみなし、両端点のxy座標を領域座標として取得する。
+
+ある帳票画像の一部にある下線部の記入欄を、図\ref{fig:underline_original}に示す。
+また、図\ref{fig:underline_original}の画像に対し、下線部の領域座標を取得し、描画した画像を、図\ref{fig:underline_drawing}に示す。
+図\ref{fig:underline_drawing}の画像は、JSON形式のファイルでの出力を確認するため、下線部の領域座標を参照して緑色で直線を描画し、同色で直線の左端点上に番号を表示している。
+図\ref{fig:underline_drawing}の下線部に表示する番号は、JSON形式のファイルにある番号と一致する。
+
+\begin{figure}[t]
+  \begin{center}
+      \includegraphics[width=15cm]{image/03-function/underline_original.jpg}
+      \caption{帳票画像にある下線部の記入欄}
+      \label{fig:underline_original}
+  \end{center}
+\end{figure}
+
+\begin{figure}[t]
+  \begin{center}
+      \includegraphics[width=15cm]{image/03-function/underline_drawing.jpg}
+      \caption{取得した下線部領域座標の描画}
+      \label{fig:underline_drawing}
+  \end{center}
+\end{figure}
+
+
+
 この処理では、確認用出力画像として、領域座標を参照して緑色の直線を描画し、同色で直線の左端点上に番号を表示した画像を出力する。
 左端点上に表示する番号は、下線部の全領域座標について、左端点のy座標を昇順にソートしたものに、0から昇順に番号をつける。
 左端点のy座標が同じ領域座標が複数存在する場合は、さらに左端点のx座標を昇順にソートしている。
@@ -72,7 +120,8 @@
 この処理では、確認用出力画像として、文字位置を参照して赤色のバウンディングボックスを描画し、同色でバウンディングボックスの
 
 \subsection{属性推測}\label{subsec:att_prediction}
-取得文字に対して、大規模言語モデルによる属性の推測を行う。以下に、属性の候補を定義する。
+取得文字に対して、大規模言語モデルによる属性の推測を行う。
+以下に、属性の候補を定義する。
 
 \begin{itemize}
 	\item 日付(date)
