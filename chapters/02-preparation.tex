@@ -11,6 +11,7 @@
 
 \begin{itemize}
 	\item 帳票の電子文書または電子化文書の画像である。
+	\item 画像の背景が白色である。
 	\item 日本語かつ横書きの帳票である。
 	\item 文字が手書きではない。
 	\item 入力欄が矩形または下線で示されている。
@@ -92,6 +93,14 @@ findContours関数は、画像内にある物体の輪郭を検出する関数�
 HoughLinesP関数は、画像内にある直線を検出する関数である。
 本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で直線を検出するために用いる。
 
+\paragraph{drawContours関数}
+drawContours関数は、輪郭を画像に描画する関数である。
+本研究では、文字情報取得用画像処理(\ref{subsec:image_processing_for_char_recognition}節)で白色の矩形と直線を描画するためと、領域強調画像出力処理(\ref{subsec:area_highlighted_image_output_processing}節)で矩形領域と下線部領域を描画するために用いる。
+
+\paragraph{putText関数}
+putText関数は、文字を画像に描画する関数である。
+本研究では、領域強調画像出力処理(\ref{subsec:area_highlighted_image_output_processing}節)で領域とラベルを描画するために用いる。
+
 \section{DeblurGANv2}\label{sec:DeblurGANv2}
 DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用したツールである\cite{DeblurGANv2}。
 スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
@@ -101,7 +110,10 @@ DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用�
 
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
 光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字コードに変換することである\cite{光学文字認識}。
-本研究では、文字認識処理(\ref{subsec:char_recognition_processing}節)および文字位置取得処理(\ref{subsec:char_position_obtainment_processing}節)で光学文字認識ソフトであるTesseract-OCRを用いて、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
+本研究では、文字認識処理(\ref{subsec:char_recognition_processing}節)および文字位置取得処理(\ref{subsec:char_position_obtainment_processing}節)で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
+また、本研究では、光学文字認識ソフトであるTesseract-OCRを、PythonのOCR用のラッパーライブラリであるPyOCRから用いる。
+PyOCRを用いることにより、文字を認識する処理にbuilderという変数をパラメータとして指定できる。
+本研究では、LineBoxBuilderを変数builderに指定し、行単位で文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する。
 
 \section{Fugashi}\label{sec:Fugashi}
 Fugashiは、形態素解析ソフトウェアであるMecabをPythonで使用する際のラッパーライブラリである\cite{Fugashi}。

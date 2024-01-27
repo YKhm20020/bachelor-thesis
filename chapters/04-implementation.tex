@@ -1,6 +1,7 @@
 \chapter{本提案手法の実装}\label{cha:Implementation}
 本提案手法は、領域座標取得部、文字情報取得部、ラベル付与部の3つの処理部で構成する。
 本提案手法の構成を、図\ref{fig:structure}に示す。
+
 以降、本章では3つの処理部について説明する。
 
 \begin{figure}[t]
@@ -43,7 +44,7 @@
 
 \subsection{矩形領域座標取得処理}\label{subsec:rect_coords_obtainment_processing}
 矩形領域座標取得処理は、矩形の記入欄を検出し、各頂点のxy座標を矩形領域座標として取得し、出力する処理である。
-本処理の出力は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing})の一部で利用する。
+本処理の出力は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)の一部で利用する。
 
 \ref{subsec:image_processing_for_rect_coords_obtainment}節の画像処理後、OpenCVのfindContours関数(\ref{sec:OpenCV}節を参照)による輪郭検出を用いて矩形の帳票画像記入欄を検出し、矩形領域座標を取得する。
 なお、以下の条件のいずれかに該当する矩形については、誤検知の場合があるとして、出力の対象外とする。
@@ -82,6 +83,9 @@
 
 \subsection{下線部領域座標取得用画像処理}\label{subsec:image_processing_for_underline_coords_obtainment}
 下線部領域座標取得用画像処理は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)の実行にあたり、必要な画像処理を行う。
+下線部の取得にあたり、OpenCVのHoughLinesP関数(\ref{sec:OpenCV}節を参照)を用いる。
+この関数を呼び出すとき、第一引数に渡す処理画像のパスについて、渡したパスの処理画像は白または黒色の画像でなければエラーが発生してしまうため、帳票画像に画像処理を施す必要がある。
+
 以下に、下線部領域座標の取得に必要な画像処理の順を示す。
 なお、本処理における画像処理の一部は、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)と同様の画像処理を施す。
 
@@ -105,8 +109,6 @@
 
 \subsection{下線部領域座標取得処理}\label{subsec:underline_coords_obtainment_processing}
 下線部領域座標取得処理は、下線部の記入欄を検出し、両端点のxy座標を下線部領域座標として取得し、出力する処理である。
-下線部の取得にあたり、OpenCVのHoughLinesP関数(\ref{sec:OpenCV}節を参照)を用いる。
-この関数を呼び出すとき、第一引数に渡す処理画像のパスについて、渡したパスの処理画像は白または黒色の画像でなければエラーが発生してしまうため、帳票画像に画像処理を施す必要がある。
 
 \ref{subsec:image_processing_for_underline_coords_obtainment}節の画像処理後、OpenCVのHoughLinesP関数によるハフ変換を用いて下線の帳票画像記入欄を検出し、下線部領域座標を取得する。
 なお、以下の条件のいずれかに該当する直線については、誤検出の場合があるとして、出力の対象外とする。
@@ -138,9 +140,13 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
 \begin{enumerate}
     \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
         \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
-    \item \ref{sec:area_coords_obtainment_part}節の出力である領域座標を参照した、矩形領域と下線部領域を白色で描画\\
+    \item \ref{sec:area_coords_obtainment_part}節の出力である領域座標を取得
+        後述する、領域を白色で描画する処理で利用するため。
+    \item OpenCVのdrawContours関数(\ref{sec:OpenCV}節を参照)と、OpenCVのline関数(\ref{sec:OpenCVを参照})を用いた、白色で矩形領域と下線部領域の描画\\
         帳票画像に対して、矩形領域座標は矩形を、下線部領域座標は直線を白色で描画することで、帳票画像記入欄を白くする。
         本提案手法では、白色かつ太さ12ピクセルの矩形と直線を描画する。
+    \item OpenCVのimwrite関数を用いた、画像の保存\\
+        画像を保存し、処理対象の画像を、入力である帳票画像から、白色で領域を描画した画像に変更する。
     \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化\\
         \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
     \item OpenCVのthreshold関数を用いた、大津の二値化による二値画像への変換\\
@@ -152,7 +158,8 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
 
 \subsection{文字認識処理}\label{subsec:char_recognition_processing}
 文字認識処理は、認識した文字を取得文字として取得する処理である。
-画像処理後、Tesseract-OCRによる文字認識を行う。
+\label{subsec:image_processing_for_char_recognition}節の画像処理後、Tesseract-OCRによる文字認識を行う。
+本処理は、PythonのOCR用のラッパーライブラリであるPyOCRから、変数builderをLineBoxBuilderを指定し、行単位で文字認識を行う。
 文字認識処理と同時に、文字認識処理(\ref{subsec:char_recognition_processing}節)を行う。
 
 
@@ -179,14 +186,16 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
 
 これによって、人間の目視で同じ行に存在すると認識する複数の文字を対象に、文字位置取得時点のy座標について、最小のy座標と最大のy座標の差が10ピクセル以上である場合を除き、正しくソートができる。
 
-ある帳票画像に対して文字位置取得処理を施し、同一行における取得文字の左右の順番をバラバラに認識した場合のバウンディングボックスの画像を図\ref{fig:before_sorted_string}に示す。
+ある帳票画像に対して文字位置取得処理を施し、同一行における取得文字の左右の順番をバラバラに認識した場合のバウンディングボックスを描画した画像を図\ref{fig:before_sorted_string}に示す。
 図\ref{fig:before_sorted_string}内の12番から15番について、左から14番、15番、13番、12番となっている。
-これに対し、y座標を10分の1にした値で比較することにより、左右の順番を左から右へ番号が大きくなるようソートした場合のバウンディングボックスの画像を図\ref{fig:after_sorted_string}に示す。
+これに対し、y座標を10分の1にした値で比較することにより、左右の順番を左から右へ番号が大きくなるようソートした場合のバウンディングボックスを描画した画像を図\ref{fig:after_sorted_string}に示す。
 ソート後は、図\ref{fig:after_sorted_string}内における12番から15番は、左から12番、13番、14番、15番となっており、左右の順番を入れ替えることに成功していることがわかる。
 
 \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=15cm]{image/04-implementation/before_sorted_string.png}
+        \fbox{
+            \includegraphics[width=15cm]{image/04-implementation/before_sorted_string.png}
+        }
         \caption{左右の順番をバラバラに認識した文字位置取得処理の出力}
         \label{fig:before_sorted_string}
     \end{center}
@@ -194,7 +203,9 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
 
 \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=15cm]{image/04-implementation/after_sorted_string.png}
+        \fbox{
+            \includegraphics[width=15cm]{image/04-implementation/after_sorted_string.png}
+        }
         \caption{同行の番号を左から右へ昇順となるようソートした文字位置取得処理の出力}
         \label{fig:after_sorted_string}
     \end{center}
@@ -250,7 +261,7 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
 
 
 \section{ラベル付与部}\label{sec:label_link_part}
-ラベル付与部では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節)後の取得文字の属性を、日付(date)、文字列(string)、数値(number)の3つから適当なものを推測し、取得した領域にラベルとして付与する。
+ラベル付与部では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節)後の取得文字の属性を、日付(date)、文字列(string)、数値(number)の3つから適切なものを推測し、取得した領域にラベルとして付与する。
 付与するラベルの種類は、領域近傍の取得文字から推測する属性に依存する。
 領域座標と、領域座標に対応するラベルを組としたJSON形式のファイルを出力とする。
 
@@ -275,14 +286,12 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
         後述する属性の補正を行うにあたり、取得文字に含む文字から補正を行い、意図しない属性に補正することを防ぐ。
     \item 以下の条件分岐により、属性を補正する。
         \begin{itemize}
-            \item 初期値として、全文字の属性を文字列(string)とする。
-            \item 出力に「日」を含む場合は、日付(date)として判定し、属性を更新する。
-            \item 出力に「数」を含む場合は、数値(number)として判定し、属性を更新する。
-            \item 出力に「日」、「数」を含まない、または属性が推測不可である場合は、初期値から変化せず、文字列(string)として判定する。
+            \item 全文字の属性を文字列(string)とする。
+            \item 出力に「日」を含む場合は、日付(date)として判定し、属性を文字列(string)から更新し、属性を補正する。
+            \item 出力に「数」を含む場合は、数値(number)として判定し、属性を文字列(string)から更新し、属性を補正する。
+            \item 出力に「日」、「数」を含まない場合は、そのまま文字列(string)として判定し、属性を補正する。
         \end{itemize}
 \end{enumerate}
-
-
 
 \subsection{ラベル割付処理}\label{subsec:label_link_processing}
 ラベル割付処理では、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標に対して、近傍に存在する文字の属性を割り付ける。
@@ -297,4 +306,35 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
     \item 既にラベルを割り付けた領域座標は、ラベルを更新する。
 \end{enumerate}
 
-以上の繰り返し処理後、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標と、領域座標に対応するラベルの組をJSON形式で出力する。
+以上の繰り返し処理後、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標と、領域座標に対応するラベルの組をJSON形式のファイルで出力する。
+
+\section{ファイル出力部}\label{subsec:file_output_part}
+ファイル出力部では、領域座標と、対応するラベルを組とするJSON形式のファイルと、取得領域を強調表示したPNG画像2枚を出力する。
+JSON形式のファイルと、PNG画像のエクスポートにあたって、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標と、ラベル割付処理(\ref{subsec:label_link_processing}節)で取得したラベルを参照する。
+
+
+\subsection{JSON形式ファイル出力処理}\label{subsec:json_file_output_processing}
+JSON形式ファイル出力処理では、取得した領域座標とラベルを整形し、領域座標と、対応するラベルを組とするJSON形式のファイルを出力する処理である。
+
+\subsection{領域強調画像出力処理}\label{subsec:area_highlighted_image_output_processing}
+領域強調画像出力処理では、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標と、ラベル割付処理(\ref{subsec:label_link_processing}節)で取得したラベルを参照し、矩形と直線を、割り付けたラベルと共に描画した画像を出力する。
+出力する画像については、矩形の帳票画像記入欄を描画した画像と、下線部の帳票画像記入欄を描画した画像の計2枚の画像を出力する。
+本研究では、矩形の帳票画像記入欄を描画した画像を矩形領域強調画像、下線部の帳票画像記入欄を描画した画像を下線部領域強調画像と呼ぶ。
+矩形領域強調画像については、取得した矩形領域ごとにランダムなRGBカラーで、矩形領域の各辺を描画することで、矩形領域を強調表示している。
+さらに、左上頂点の上に、JSON形式のファイル内のrect\_dataオブジェクトのidキーに対応する値と対応する値と、labelキーに対応する値を表示する。
+下線部の帳票画像記入欄については、緑色で下線部領域の直線を描画することで、下線部領域を強調表示している。
+さらに、左端点の上に、JSON形式のファイル内のunderlines\_dataオブジェクトのidキーに対応する値と対応する値と、labelキーに対応する値を表示する。
+これにより、人間が目視でJSON形式のファイルを確認する場合と比較して、取得した領域座標と割り付けたラベルの確認が容易となる。
+
+以下に、矩形と直線を、割り付けたラベルと共に描画した画像を出力する流れを示す。
+
+\begin{enumerate}
+    \item 領域座標と、領域座標に対応するラベルを取得する。
+    \item Pythonのcopy関数により、入力である帳票画像をコピーし、2枚の帳票画像を生成する。
+    \item 入力である帳票画像に対して、OpenCVのdrawContours関数を、OpenCVのline関数を用いて、それぞれ矩形と直線を別の帳票画像に描画する。
+    \item OpenCVのputText関数(\ref{sec:OpenCV}節を参照)を用いて、idキーに対応する値と対応する値と、labelキーに対応する値を描画する。
+    \item OpenCVのimwrite関数を用いて、矩形領域強調画像と下線部領域強調画像を保存する。
+\end{enumerate}
+
+
+以上の処理後、矩形と直線を描画した

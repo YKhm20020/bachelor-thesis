@@ -1,6 +1,7 @@
 \chapter{適用例}\label{cha:Indication}
-本章では、本提案手法を適用した適用例を示す。
-本提案手法を適用する帳票画像を、以下の図\ref{fig:indication_original}に示す。
+本章では、本研究で提案した手法が正しく動作することを確認する。
+適用例として、本提案手法を適用する帳票画像を、以下の図\ref{fig:indication_original}に示す。
+図\ref{fig:indication_original}に対して、本提案手法を適用し、出力であるJSON形式のファイルとPNG形式の画像を確認する。
 
 \begin{figure}[t]
     \begin{center}
@@ -11,56 +12,25 @@
 \end{figure}
 
 
-\section{領域座標取得部の出力結果}\label{sec:result_area_coords_obtainment}
-図\ref{fig:indication_original}の帳票画像に対して、矩形領域座標を取得した結果を以下の図に示す。
-また、図\ref{fig:indication_original}の帳票画像に対して、下線部領域座標を取得した結果を以下の図に示す。
-
+\section{JSON形式のファイルの出力結果}\label{sec:result_json}
+図\ref{fig:indication_original}の帳票画像に対して、本提案手法を適用し、出力したJSON形式のファイルの一部を以下の図\ref{fig:exported_json}に示す。
 
 \begin{figure}[t]
     \begin{center}
         \includegraphics[width=15cm]{image/05-indication/rects_with_label.png}
-        \caption{矩形領域座標の取得結果}
-        \label{fig:rects_with_label}
-    \end{center}
-\end{figure}
-
-\begin{figure}[t]
-    \begin{center}
-        \includegraphics[width=15cm]{image/05-indication/underlines.png}
-        \caption{下線部領域座標の出力結果}
-        \label{fig:underlines_with_label}
+        \caption{図\ref{fig:indication_original}に本提案手法を適用し、出力したJSON形式のファイルの一部}
+        \label{fig:exported_json}
     \end{center}
 \end{figure}
 
 
-
-\section{文字情報取得部の出力結果}\label{sec:result_OCR}
-図\ref{fig:indication_original}の帳票画像に対して、文字情報を取得した結果を以下の図に示す。
+\section{領域強調画像出力機能の出力結果}\label{sec:result_OCR}
+図\ref{fig:indication_original}の帳票画像に対して、本提案手法を適用し、出力したPNG形式の画像を以下に示す。
 
 \begin{figure}[t]
     \begin{center}
         \includegraphics[width=15cm]{image/05-indication/rects_with_label.png}
-        \caption{文字情報取得部の出力結果}
-        \label{fig:}
-    \end{center}
-\end{figure}
-
-\section{ラベル付与部の動作結果}\label{sec:result_area_labeling}
-図\ref{fig:indication_original}の帳票画像に対して、ラベル付きの矩形領域座標を取得した結果を以下の図に示す。
-また、図\ref{fig:indication_original}の帳票画像に対して、ラベル付きの下線部領域座標を取得した結果を以下の図に示す。
-
-\begin{figure}[t]
-    \begin{center}
-        \includegraphics[width=15cm]{image/05-indication/rects_with_label.png}
-        \caption{ラベル付き矩形領域座標の取得結果}
-        \label{fig:rects_with_label}
-    \end{center}
-\end{figure}
-
-\begin{figure}[t]
-    \begin{center}
-        \includegraphics[width=15cm]{image/05-indication/underlines_with_label.png}
-        \caption{ラベル付き下線部領域座標の出力結果}
-        \label{fig:underlines_with_label}
+        \caption{図\ref{fig:indication_original}に本提案手法を適用し、出力した矩形領域強調画像}
+        \label{fig:exported_png}
     \end{center}
 \end{figure}
