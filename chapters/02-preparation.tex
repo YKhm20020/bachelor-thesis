@@ -11,7 +11,7 @@
 
 \begin{itemize}
 	\item 帳票の電子文書または電子化文書の画像である。
-	\item 画像の背景が白色である。
+	\item 帳票の背景が白色である。
 	\item 日本語かつ横書きの帳票である。
 	\item 文字が手書きではない。
 	\item 入力欄が矩形または下線で示されている。
@@ -44,7 +44,7 @@ getStructuringElement関数は、カーネルを作成する関数である。
 \paragraph{GaussianBlur関数}
 GaussianBlur関数は、ガウシアンフィルタを適用することにより、画像内の白色ノイズを除去する関数である。
 ガウシアンフィルタは、注目画素との距離に応じて重みを変えるガウシアンカーネルを用いた、画像の平滑化によって白色ノイズを除去するフィルタである。
-標準偏差を0とすることで、カーネルの大きさから自動的に標準偏差を計算する\cite{ガウシアンフィルタ}。
+標準偏差を0とするによって、カーネルの大きさから自動的に標準偏差を計算する\cite{ガウシアンフィルタ}。
 本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)に必要な画像処理の一部として用いる。
 
 \paragraph{threshold関数}
@@ -52,11 +52,12 @@ threshold関数は、画像を二値化する関数である。
 第一引数として、グレースケール画像を指定する。
 また、第二引数では、二値化する際の閾値を指定し、第三引数では、二値化後の画素値の最大値を指定する。
 さらに、第四引数では、二値化における閾値処理手法を指定する。
-本研究で用いる閾値処理手法を指定する変数を以下に示す。
+本研究で用いる閾値処理手法を指定する変数を、以下に示す。
 
 \begin{itemize}
 	\item THRESH\_BINARY\\
 		文字情報取得部(\ref{sec:OCR_part}節)で設定する。
+		大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を第三引数で設定する値に変換し、閾値よりも大きい場合は画素数を0に変換して二値化する。
 	\item THRESH\_BINARY\_INV\\
 		下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で設定する。
 		大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を0に、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
@@ -87,14 +88,50 @@ Canny法におけるエッジ検出の閾値処理については、最低閾値
 
 \paragraph{findContours関数}
 findContours関数は、画像内にある物体の輪郭を検出する関数である。
+第一引数として、二値化処理後の画像である、二値画像を指定する。
+また、第二引数では、検出する輪郭と、それらを保存する構造を決定する変数を指定する。
+本研究では、全ての輪郭を検出し、それらを外側から順に入れ子とした階層構造とする、RECT\_TREEを指定する。
+さらに、第三引数では、輪郭となる頂点の近似法を決定する変数を指定する。
+本研究では、輪郭を表現するにあたり、冗長な点の情報を削除する、CHAIN\_APPROX\_SIMPLEを用いる。
+例えば、矩形であれば、各辺にある全ての点の座標を保存する必要はなく、4つの頂点の座標を保存することで、矩形の輪郭を表現できるため、それ以外の座標情報を削除する\cite{輪郭検出}。
 本研究では、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節)で矩形の輪郭を検出するために用いる。
 
 \paragraph{HoughLinesP関数}
-HoughLinesP関数は、画像内にある直線を検出する関数である。
+HoughLinesP関数は、ハフ変換によって画像内にある直線を検出する関数である。
+ハフ変換は、二値画像中の直線や円を検出する手法の1つであり、画像空間から$\rho$-$\theta$空間に、座標系を変換することで、直線や円を検出する手法である。
+直線を検出する場合は、極座標の二次元平面に変換する。
+直線上のある点の座標を$(x, y)$とすると、$\rho$は、座標$(x, y)$を通る直線に対して、原点から垂線を下ろしたときの長さ、$\theta$は、座標$(x, y)$を通る直線に対して、原点から垂線を下ろしたときに、X軸となす角度と表すことができる。
+よって、以下の式が成り立つ。
+
+\begin{equation}\label{eq:hough}
+	\rho = x\cos\theta + y\sin\theta
+\end{equation}
+
+座標$(x, y)$を通る直線は無数に存在するため、式\ref{eq:hough}を満たす$(\rho, \theta)$も無数に存在する。
+縦軸を$\rho$、横軸を$\theta$として、それらの$(\rho, \theta)$を、$\rho$-$\theta$空間に射影すると、線を図示できる。
+この座標系の変換を、直線上の他にある$(x, y)$以外の座標に対して行ったとき、$\rho$-$\theta$空間に交点が存在する。
+この操作を全画素に対して行い、$\rho$-$\theta$空間で多くの線が重なっている点$(\rho, \theta)$から、直線が存在する可能性が高い$\rho$、$\theta$の組を探し、直線を検出する\cite{ハフ変換}。
+HoughLinesP関数を用いる際は、以下の順で引数を渡す\cite{HoughLinesP関数の引数}。
+\begin{enumerate}
+	\item 直線を検出する二値画像のパス
+	\item 式\ref{eq:hough}における、$\rho$
+	\item 式\ref{eq:hough}における、$\theta$
+	\item 直線とみなす集合した点の数の閾値
+	\item 直線とみなす最小の長さ
+	\item 同一直線とみなす点の間隔の広さ
+\end{enumerate}
 本研究では、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節)で直線を検出するために用いる。
 
 \paragraph{drawContours関数}
 drawContours関数は、輪郭を画像に描画する関数である。
+drawContours関数を用いる際は、以下の順で引数を渡す\cite{輪郭描画}。
+\begin{enumerate}
+	\item 輪郭を描画する画像のパス
+	\item 描画する輪郭のリスト
+	\item 第二引数のうち、描画する輪郭のインデックス(-1を指定することで、全輪郭を描画する)
+	\item 輪郭を描画するRGBカラーを示すタプル
+	\item 輪郭を描画する太さ
+\end{enumerate}
 本研究では、文字情報取得用画像処理(\ref{subsec:image_processing_for_char_recognition}節)で白色の矩形と直線を描画するためと、領域強調画像出力処理(\ref{subsec:area_highlighted_image_output_processing}節)で矩形領域と下線部領域を描画するために用いる。
 
 \paragraph{putText関数}
@@ -104,7 +141,7 @@ putText関数は、文字を画像に描画する関数である。
 \section{DeblurGANv2}\label{sec:DeblurGANv2}
 DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用したツールである\cite{DeblurGANv2}。
 スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
-また、先行研究において、スマートフォンのカメラで撮影した画像に対して複数の画像処理と共にDeblurGANv2を適用することで、ブレ除去によって画像品質が向上し、Tesseract-OCRを用いた光学文字認識(\ref{sec:Optical-Charactor-Recognition}節で後述)の精度が向上することが示されている\cite{DeblurGANv2の先行研究}。
+また、先行研究において、スマートフォンのカメラで撮影した画像に対して、複数の画像処理と共にDeblurGANv2を適用することによって、ブレ除去によって画像品質が向上し、Tesseract-OCRを用いた光学文字認識(\ref{sec:Optical-Charactor-Recognition}節で後述)の精度が向上することが示されている\cite{DeblurGANv2の先行研究}。
 本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節)と文字情報取得部(\ref{sec:OCR_part}節)で施す画像処理の1つとして用いる。
 
 
