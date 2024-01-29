@@ -6,7 +6,7 @@
 
 \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=15cm]{image/structure.jpg}
+        \includegraphics[width=15cm]{image/04-implementation/structure.jpg}
         \caption{本提案手法の構造}
         \label{fig:structure}
     \end{center}
@@ -32,7 +32,7 @@
     \item OpenCVのGaussianBlur関数(\ref{sec:OpenCV}節を参照)を用いた、ガウシアンフィルタによるノイズ除去\\
         本提案手法では、カーネルの縦幅と横幅を共に3、標準偏差を0とする。
     \item OpenCVのthreshold関数(\ref{sec:OpenCV}節を参照)を用いた、大津の二値化による二値画像への変換\\
-        本提案手法では、閾値処理を大津の二値化として、閾値処理を決定する変数をTHRESH\_TOZERO\_INVに指定し、二値化する(\ref{sec:OpenCV}節を参照)。
+        本提案手法では、大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_TOZERO\_INVに指定し、二値化する(\ref{sec:OpenCV}節を参照)。
         白黒を反転して二値化することにより、複数の矩形が隣接する場合に、それらを囲む矩形を不要に検出してしまうことを防ぐ。
     \item OpenCVのgetStructuringElement関数(\ref{sec:OpenCV}節を参照)を用いた、カーネルの作成\\
         本提案手法では、5行5列の矩形カーネルを作成する。
@@ -95,7 +95,7 @@
     \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
         \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
     \item OpenCVのthreshold関数を用いた、大津の二値化による二値画像への変換\\
-        本提案手法では、閾値処理を大津の二値化として、閾値処理手法を決定する変数をTHRESH\_BINARY\_INVに指定し、二値化する。
+        本提案手法では、大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_BINARY\_INVに指定し、二値化する。
         ハフ変換(同節で後述)は白線を検出する処理であるため、白黒を反転して二値化することにより、下線の検出精度を高める。
     \item OpenCVのthreshold関数(\ref{sec:OpenCV}節を参照)を用いた、Canny法によるエッジ検出\\
         本提案手法では、閾値処理における上限と下限の閾値を、以下のように決定する。
@@ -150,7 +150,7 @@ HoughLinesP関数によって直線を検出するとき、入力画像内にあ
     \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化\\
         \ref{subsec:rect_coords_obtainment_processing}節と同様の処理
     \item OpenCVのthreshold関数を用いた、大津の二値化による二値画像への変換\\
-        本提案手法では、閾値処理を大津の二値化として、閾値処理を決定する変数をTHRESH\_BINARYに指定し、二値化する。
+        本提案手法では、大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_BINARYに指定し、二値化する。
 \end{enumerate}
 
 矩形領域と下線部領域の白色で描画することによって、文字認識に不要な黒色の画素が白色となる。
@@ -321,7 +321,7 @@ y座標が同じ場合は、さらにx座標を参照し、昇順にソートす
 \section{ラベル付与部}\label{sec:label_link_part}
 ラベル付与部では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節)後の取得文字の属性を、属性の候補(\ref{subsec:att_prediction}節を参照)である、日付(date)、文字列(string)、数値(number)の3つから適切な1つを推測し、取得した領域にラベルとして付与する。
 付与するラベルの種類は、領域近傍の取得文字から推測する属性に依存する。
-領域座標と、領域座標に対応するラベルを組としたJSON形式のファイルを出力とする。
+領域座標と、領域座標に対応するラベルを組としたJSONファイルを出力とする。
 
 \subsection{属性推測処理}\label{subsec:att_prediction_processing}
 属性推測処理では、取得文字に対して、属性の候補である、日付(date)、文字列(string)、数値(number)のいずれに該当するかを推測する。
@@ -413,12 +413,12 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 
 \section{ファイル出力部}\label{subsec:file_output_part}
 ファイル出力部では、領域座標と、対応するラベルを組とするJSON形式のファイルと、取得領域を強調表示したPNG形式の画像2枚を出力する。
-JSON形式のファイルと、PNG形式の画像のエクスポートにあたって、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標と、ラベル割付処理(\ref{subsec:label_link_processing}節)で取得したラベルを参照する。
+JSONファイルと、PNG画像のエクスポートにあたって、領域座標取得部(\ref{sec:area_coords_obtainment_part}節)で取得した領域座標と、ラベル割付処理(\ref{subsec:label_link_processing}節)で取得したラベルを参照する。
 
 
-\subsection{JSON形式ファイル出力処理}\label{subsec:json_file_output_processing}
-JSON形式ファイル出力処理では、取得した領域座標とラベルを整形し、領域座標と、対応するラベルを組とするJSON形式のファイルを出力する処理である。
-以下に、出力するJSON形式のファイルの構造を示す。
+\subsection{JSONファイル出力処理}\label{subsec:json_file_output_processing}
+JSONファイル出力処理では、取得した領域座標とラベルを整形し、領域座標と、対応するラベルを組とするJSONファイルを出力する処理である。
+以下に、出力するJSONファイルの構造を示す。
 
 \begin{itemize}
     \item 矩形領域のラベルと領域の座標をまとめたrects\_data配列と、下線部領域のラベルと領域座標をまとめたunderlines\_data配列がある。
@@ -453,10 +453,10 @@ JSON形式ファイル出力処理では、取得した領域座標とラベル�
 出力する画像については、矩形の帳票画像記入欄を描画した画像と、下線部の帳票画像記入欄を描画した画像の計2枚の画像を出力する。
 本研究では、矩形の帳票画像記入欄を描画した画像を矩形領域強調画像、下線部の帳票画像記入欄を描画した画像を下線部領域強調画像と呼ぶ。
 矩形領域強調画像については、取得した矩形領域ごとにランダムなRGBカラーで、矩形領域の各辺を描画することによって、矩形領域を強調表示している。
-さらに、左上頂点の上に、JSON形式のファイル内のrect\_data配列のidキーに対応する値と、labelキーに対応する値を表示する。
+さらに、左上頂点の上に、JSONファイル内のrect\_data配列のidキーに対応する値と、labelキーに対応する値を表示する。
 下線部の帳票画像記入欄については、緑色で下線部領域の直線を描画することによって、下線部領域を強調表示している。
-さらに、左端点の上に、JSON形式のファイル内のunderlines\_data配列のidキーに対応する値と、labelキーに対応する値を表示する。
-これにより、人間が目視でJSON形式のファイルを確認する場合と比較して、取得した領域座標と割り付けたラベルの確認が容易となる。
+さらに、左端点の上に、JSONファイル内のunderlines\_data配列のidキーに対応する値と、labelキーに対応する値を表示する。
+これにより、人間が目視でJSONファイルを確認する場合と比較して、取得した領域座標と割り付けたラベルの確認が容易となる。
 
 以下に、矩形と直線を、割り付けたラベルと共に描画した画像を出力する流れを示す。
 
