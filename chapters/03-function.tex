@@ -21,6 +21,8 @@
           本提案手法によって取得する領域の座標。
           矩形領域であれば、各頂点のxy座標にあたる。
           下線部領域であれば、両端点のxy座標にあたる。
+    \item 文字情報\\
+          文字認識によって得る、認識した文字と、それを囲むバウンディングボックスの各頂点のxy座標。
     \item 属性\\
           文字認識によって得た文字から推測するデータ型。
     \item ラベル\\
@@ -62,23 +64,23 @@
 {
     "rects_data": [
         "id": 0, 
-        "label": "date",
+        "label": "number",
         "coords": {
             "top_left": {
-                "x": 2075,
-                "y": 752
+                "x": 1339,
+                "y": 1288
             },
             "buttom_left": {
-                "x": 2079,
-                "y": 953
+                "x": 1339,
+                "y": 1377
             },
             "buttom_right": {
-                "x": 2190,
-                "y": 951
+                "x": 1782,
+                "y": 1377
             },
             "top_right": {
-                "x": 2186,
-                "y": 750
+                "x": 1782,
+                "y": 1288
             }
         }
     ],
@@ -110,22 +112,24 @@
 \begin{enumerate}
     \item 矩形領域取得
     \item 下線部領域取得
-    \item 文字および文字位置取得
+    \item 文字情報取得
     \item 属性推測
     \item ラベル割付
 \end{enumerate}
 
 \subsection{矩形領域取得}\label{subsec:rect_coords_obtainment}
 矩形領域取得は、矩形の領域を帳票画像記入欄とみなし、各頂点のxy座標を領域座標として取得する。
-取得した領域座標を、y座標について昇順にソートし、0から順に番号を割り振る。
+以降、下線部の領域座標と区別するため、矩形領域の領域座標を、矩形領域座標と呼ぶ。
+取得した矩形領域座標を、y座標について昇順にソートし、0から順に番号を割り振る。
 出力するJSONファイルにおける、rects\_data配列内の、idキーに対応する値とcoordsオブジェクトのデータを取得する。
 
 \subsection{下線部領域取得}\label{subsec:underline_coords_obtainment}
 下線部領域取得は、水平な直線を帳票画像記入欄とみなし、両端点のxy座標を領域座標として取得する。
-取得した領域座標を、y座標について昇順にソートし、0から順に番号を割り振る。
+以降、矩形の領域座標と区別するため、下線部領域の領域座標を、下線部領域座標と呼ぶ。
+取得した下線部領域座標を、y座標について昇順にソートし、0から順に番号を割り振る。
 出力するJSONファイルにおける、underlines\_data配列内の、idキーに対応する値とcoordsオブジェクトのデータを取得する。
 
-\subsection{文字とおよび文字位置の取得}\label{subsec:char_and_bbox_obtainment}
+\subsection{文字情報取得}\label{subsec:char_information_obtainment}
 入力である帳票画像に対して文字認識を行い、検出した文字を取得文字とし、検出した文字を囲むバウンディングボックスの各頂点の座標を文字位置として、それぞれ取得する。
 取得文字と文字位置は、属性推測(\ref{subsec:att_prediction}節で後述)で用いる。
 
@@ -161,7 +165,8 @@
 図\ref{fig:rect_drawing}の画像から、矩形領域座標を参照してランダムなRGBカラーで矩形を描画し、同色で矩形左上隅に番号と文字列を表示していることがわかる。
 図\ref{fig:rect_drawing}の矩形に表示する番号は、JSONファイル内のrect\_data配列のidキーに対応する値と一致する。
 同様に、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーに対応する値と一致する。
-例えば、
+図\ref{fig:rect_drawing}の画像中にある、「単価」という文字がある矩形の左上頂点には、「0: number」と描画している。
+これは、rects\_data配列のidキーに0が、labelキーにnumberがそれぞれ対応することを示す。
 
 \begin{figure}[t]
     \begin{center}
@@ -176,7 +181,7 @@
 \begin{figure}[t]
     \begin{center}
         \fbox{
-            \includegraphics[width=15cm]{image/03-function/rects_with_label.png}
+            \includegraphics[width=15cm]{image/03-function/rects_with_label.jpg}
         }
         \caption{取得した矩形領域座標の描画}
         \label{fig:rect_drawing}
@@ -185,11 +190,12 @@
 
 図\ref{fig:original}内にある帳票画像記入欄のうち、下線部の帳票画像記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
 また、図\ref{fig:underline_original}の画像に対し、下線部の領域座標とラベルを取得し、描画した画像を、図\ref{fig:underline_drawing}に示す。
-図\ref{fig:underline_drawing}の画像から、下線部の領域座標を参照して緑色で直線を描画し、同色で直線の左端点上に番号と文字列を表示していることがわかる。
+図\ref{fig:underline_drawing}の画像から、下線部の領域座標を参照して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示していることがわかる。
 図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーに対応する値と一致する。
 同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーに対応する値と一致する。
+図\ref{fig:rect_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: number」と描画している。
+これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
 
-% ここ差し替えること！！！！！！！！！！
 \begin{figure}[t]
     \begin{center}
         \fbox{
@@ -203,7 +209,7 @@
 \begin{figure}[t]
     \begin{center}
         \fbox{
-            \includegraphics[width=15cm]{image/03-function/underlines_with_label.png}
+            \includegraphics[width=15cm]{image/03-function/underlines_with_label.jpg}
         }
         \caption{取得した下線部領域座標の描画}
         \label{fig:underline_drawing}
