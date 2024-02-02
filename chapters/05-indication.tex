@@ -16,7 +16,6 @@
 具体的には、矩形領域強調画像と、JSONファイルのrects\_data配列を参照し、矩形領域の出力結果を確認する。
 同様に、下線部領域強調画像と、JSONファイル内のunderlines\_data配列を参照し、下線部領域の出力結果を確認する。
 
-\section{矩形領域についての出力結果}\label{sec:result_rect}
 図\ref{fig:indication_original}に対して、本提案手法を適用し、出力したJSONファイルのうち、rects\_data配列の一部を、図\ref{fig:rects_data_json}に示す。
 また、図\ref{fig:rects_data_json}のJSONファイルと同時に出力した2枚の領域強調画像のうち、矩形領域を強調した画像の一部を図\ref{fig:highlighted_rects_part}に示す。
 
@@ -24,46 +23,46 @@
 \begin{figure}[t]
     \begin{lstlisting}
         {
-            "id": 0,
+            "id": 4,
             "label": "string",
             "coords": {
                 "top_left": {
                     "x": 275,
-                    "y": 722
+                    "y": 817
                 },
                 "buttom_left": {
                     "x": 275,
-                    "y": 808
+                    "y": 903
                 },
                 "buttom_right": {
                     "x": 1008,
-                    "y": 808
+                    "y": 903
                 },
                 "top_right": {
                     "x": 1008,
-                    "y": 722
+                    "y": 817
                 }
             }
         },
         {
-            "id": 1,
+            "id": 5,
             "label": "number",
             "coords": {
                 "top_left": {
                     "x": 1016,
-                    "y": 722
+                    "y": 817
                 },
                 "buttom_left": {
                     "x": 1016,
-                    "y": 808
+                    "y": 903
                 },
                 "buttom_right": {
                     "x": 1308,
-                    "y": 808
+                    "y": 903
                 },
                 "top_right": {
                     "x": 1308,
-                    "y": 722
+                    "y": 817
                 }
             }
         },
@@ -81,23 +80,17 @@
     \end{center}
 \end{figure}
 
-図\ref{fig:rects_data_json}より、idキーに対応する値は0、1となっており、それぞれラベルはstring、numberとなっている。
-図\ref{fig:highlighted_rects_part}より、画像内に描画した矩形領域の番号のうち、0番と1番の矩形領域には、ラベルをそれぞれstring、numberを割り付けていることがわかる。
-これにより、取得した矩形領域については、JSONファイルと矩形領域画像は正しくラベルを割り付けていることが確認できた。
-
-
-\section{下線部領域についての出力結果}\label{sec:result_underline}
-図\ref{fig:indication_original}に対して、本提案手法を適用し、出力したJSONファイルのうち、underline\_data配列の一部を、図\ref{fig:rects_data_json}に示す。
-また、図\ref{fig:rects_data_json}のJSONファイルと同時に出力した2枚の下線部強調画像のうち、下線部領域を強調した画像の一部を図\ref{fig:highlighted_rects_part}に示す。
+図\ref{fig:indication_original}に対して、本提案手法を適用し、出力したJSONファイルのうち、underline\_data配列の一部を、図\ref{fig:underlines_data_json}に示す。
+また、図\ref{fig:underlines_data_json}のJSONファイルと同時に出力した2枚の下線部強調画像のうち、下線部領域を強調した画像の一部を図\ref{fig:highlighted_underlines_part}に示す。
 
 \lstset{language=}
 \begin{figure}[t]
     \begin{lstlisting}
         {
-            "id": 3,
+            "id": 0,
             "label": "date",
             "left": {
-                "x": 868,
+                "x": 869,
                 "y": 354
             },
             "right": {
@@ -106,23 +99,11 @@
             }
         },
         {
-            "id": 4,
-            "label": "string",
-            "left": {
-                "x": 868,
-                "y": 2024
-            },
-            "right": {
-                "x": 1512,
-                "y": 2024
-            }
-        },
-        {
-            "id": 5,
+            "id": 1,
             "label": "number",
             "left": {
                 "x": 1908,
-                "y": 354
+                "y": 355
             },
             "right": {
                 "x": 2265,
@@ -136,14 +117,99 @@
 \begin{figure}[t]
     \begin{center}
         \fbox{
-            \includegraphics[width=15cm]{image/05-indication/highlighted_underlines_label.jpg}
+            \includegraphics[width=15cm]{image/05-indication/highlighted_underlines_part.jpg}
         }
         \caption{下線部領域を強調した画像の一部}
         \label{fig:highlighted_underlines_part}
     \end{center}
 \end{figure}
 
-図\ref{fig:underlines_data_json}のうち、idキーが3、5のオブジェクトに注目する。
-図\ref{fig:underlines_data_json}より、idキーに対応する値は3、4、5となっており、それぞれラベルはdate、string、numberとなっている。
-図\ref{fig:highlighted_underlines_part}より、画像内に描画した下線部領域の番号のうち、3番と5番の下線部領域には、ラベルをそれぞれdate、numberを割り付けていることがわかる。
-これにより、取得した下線部領域については、JSONファイルと下線部領域画像は正しくラベルを割り付けていることが確認できた。
+\section{矩形領域についての出力結果}\label{sec:result_rect}
+本節は、矩形領域についての出力結果を確認する。
+図\ref{fig:rects_data_json}より、idキーに対応する値は4、5となっており、それぞれラベルはstring、numberとなっている。
+図\ref{fig:highlighted_rects_part}より、画像内に描画した矩形領域の番号のうち、4番と5番の矩形領域は、品名、および、数量を記入する欄であることがわかる。
+品名、数量という記入欄については、それぞれ文字列(string)、数値(number)が正しいラベルであるため、これら2つの矩形領域については、正しくラベルを割り付けていることを確認できた。
+他の矩形領域に対しても、一部を除き、正しくラベルを割り付けていることを確認した。
+
+一部の矩形領域については、本来割り付けるべきラベルとは異なるラベルを誤って割り付けた。
+JSONファイルのうち、誤ったラベルを割り付けた矩形領域座標を、図\ref{fig:rects_data_miss_json}に示す。
+また、図\ref{fig:rects_data_miss_json}に示した箇所の下線部領域強調画像を、図\ref{fig:highlighted_rects_miss_part}に示す。
+
+\lstset{language=}
+\begin{figure}[t]
+    \begin{lstlisting}
+        {
+            "id": 25,
+            "label": "string",
+            "coords": {
+                "top_left": {
+                    "x": 1713,
+                    "y": 1283
+                },
+                "buttom_left": {
+                    "x": 1713,
+                    "y": 1369
+                },
+                "buttom_right": {
+                    "x": 2262,
+                    "y": 1369
+                },
+                "top_right": {
+                    "x": 2262,
+                    "y": 1283
+                }
+            }
+        },
+    \end{lstlisting}
+    \caption{誤ったラベルを割り付けた矩形領域座標}\label{fig:rects_data_miss_json}
+\end{figure}
+
+\begin{figure}[t]
+    \begin{center}
+        \fbox{
+            \includegraphics[width=15cm]{image/05-indication/highlighted_rects_miss_part.jpg}
+        }
+        \caption{図\ref{fig:rects_data_miss_json}の矩形領域を描画した矩形領域強調画像}
+        \label{fig:highlighted_rects_miss_part}
+    \end{center}
+\end{figure}
+
+図\ref{fig:rects_data_miss_json}は、idキーに対応する値が25の矩形領域は、labelキーに対応する値がstringであることを示す。
+図\ref{fig:highlighted_rects_miss_part}の画像を確認すると、25番の矩形領域は、小計を記入する欄であることがわかる。
+本来割り付けるべきラベルは数値(number)であるため、誤ったラベルを割り付けていることがわかる。
+この問題点については、\ref{sec:problems}節で後述する。
+
+
+\section{下線部領域についての出力結果}\label{sec:result_underline}
+図\ref{fig:underlines_data_json}より、idキーに対応する値は0、1となっており、それぞれラベルはdate、numberとなっている。
+図\ref{fig:highlighted_underlines_part}より、0番と1番の下線部領域は、年月日、および、No.を記入する欄であることがわかる。
+年月日、No.という記入欄については、それぞれ日付(date)、数値(number)が正しいラベルであるため、これら2つの下線部領域については、正しくラベルを割り付けていることを確認できた。
+他の下線部領域に対しても、一部を除き、正しくラベルを割り付けていることを確認した。
+
+一部の下線部領域については、本来割り付けるべきラベルとは異なるラベルを誤って割り付けた。
+JSONファイルのうち、誤ったラベルを割り付けた下線部領域座標を、図\ref{fig:underlines_data_miss_json}に示す。
+図\ref{fig:underlines_data_miss_json}の下線部領域は、図\ref{fig:highlighted_underlines_part}の2番の下線部領域である。
+
+\lstset{language=}
+\begin{figure}[t]
+    \begin{lstlisting}
+        {
+            "id": 2,
+            "label": "date",
+            "left": {
+                "x": 273,
+                "y": 615
+            },
+            "right": {
+                "x": 1312,
+                "y": 615
+            }
+        },
+    \end{lstlisting}
+    \caption{誤ってラベルを割り付けた下線部領域}\label{fig:underlines_data_miss_json}
+\end{figure}
+
+図\ref{fig:underlines_data_miss_json}は、idキーに対応する値が2の下線部領域は、labelキーに対応する値がdateであることを示す。
+図\ref{fig:highlighted_rects_miss_part}の画像を確認すると、2番の下線部領域は、宛名を記入する欄であることがわかる。
+本来割り付けるべきラベルは文字列(string)であるため、誤ったラベルを割り付けていることがわかる。
+この問題点については、\ref{sec:problems}節で後述する。

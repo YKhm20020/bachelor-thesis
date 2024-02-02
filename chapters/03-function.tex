@@ -147,7 +147,7 @@
 取得した属性は、ラベル割付(\ref{subsec:label_link}節で後述)で用いる。
 
 \subsection{ラベル割付}\label{subsec:label_link}
-\ref{sec:eform_write_space_obtainment_feature}節で述べた領域座標と、\ref{subsec:char_and_bbox_obtainment}節で述べた文字位置、\ref{subsec:att_prediction}節で述べた属性を用いる。
+\ref{subsec:rect_coords_obtainment}節と\ref{subsec:underline_coords_obtainment}節で述べた領域座標と、\ref{subsec:char_information_obtainment}節で述べた文字位置、\ref{subsec:att_prediction}節で述べた属性を用いる。
 文字位置の近傍に存在する領域座標を対象に属性を割り付け、ラベルとして得る。
 出力するJSONファイルにおける、rects\_data配列、およびunderlines\_data配列内の、labelキーに対応する値を取得する。
 
@@ -161,8 +161,8 @@
 矩形をランダムなRGBカラーで描画する理由は、矩形領域が隣接する際に、視認性が低下することを防ぐためである。
 
 図\ref{fig:original}に示した帳票画像記入欄のうち、矩形の帳票画像記入欄の一部を切り取った画像を、図\ref{fig:rect_original}に示す。
-また、図\ref{fig:rect_original}の元画像に対し、矩形の領域座標を取得し、描画した画像を、図\ref{fig:rect_drawing}に示す。
-図\ref{fig:rect_drawing}の画像から、矩形領域座標を参照してランダムなRGBカラーで矩形を描画し、同色で矩形左上隅に番号と文字列を表示していることがわかる。
+また、図\ref{fig:rect_original}の元画像に対し、矩形領域座標を取得し、描画した画像を、図\ref{fig:rect_drawing}に示す。
+図\ref{fig:rect_drawing}の画像から、矩形領域座標を参照してランダムなRGBカラーで矩形を描画し、同色で矩形左上に番号と文字列を表示していることがわかる。
 図\ref{fig:rect_drawing}の矩形に表示する番号は、JSONファイル内のrect\_data配列のidキーに対応する値と一致する。
 同様に、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーに対応する値と一致する。
 図\ref{fig:rect_drawing}の画像中にある、「単価」という文字がある矩形の左上頂点には、「0: number」と描画している。
@@ -188,9 +188,9 @@
     \end{center}
 \end{figure}
 
-図\ref{fig:original}内にある帳票画像記入欄のうち、下線部の帳票画像記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
-また、図\ref{fig:underline_original}の画像に対し、下線部の領域座標とラベルを取得し、描画した画像を、図\ref{fig:underline_drawing}に示す。
-図\ref{fig:underline_drawing}の画像から、下線部の領域座標を参照して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示していることがわかる。
+図\ref{fig:original}内にある帳票画像記入欄のうち、下線部帳票画像記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
+また、図\ref{fig:underline_original}の画像に対し、下線部領域座標とラベルを取得し、描画した画像を、図\ref{fig:underline_drawing}に示す。
+図\ref{fig:underline_drawing}の画像から、下線部領域座標を参照して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示していることがわかる。
 図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーに対応する値と一致する。
 同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーに対応する値と一致する。
 図\ref{fig:rect_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: number」と描画している。

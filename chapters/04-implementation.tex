@@ -112,7 +112,7 @@
 \subsection{下線部領域座標取得処理}\label{subsec:underline_coords_obtainment_processing}
 下線部領域座標取得処理は、下線部の帳票画像記入欄を検出し、下線部領域座標を取得、および、出力する処理である。
 
-\ref{subsec:image_processing_for_underline_coords_obtainment}節の画像処理後、OpenCVのHoughLinesP関数によるハフ変換を用いて下線部の帳票画像記入欄を検出し、下線部領域座標を取得する。
+\ref{subsec:image_processing_for_underline_coords_obtainment}節の画像処理後、OpenCVのHoughLinesP関数によるハフ変換を用いて、下線部の帳票画像記入欄を検出する。
 なお、以下の条件のいずれかに該当する直線については、誤検出の可能性が高いとして、出力の対象外とする。
 条件の1つに矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節を参照)の出力を、判定する際に利用する。
 
@@ -135,7 +135,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 文字情報取得部の出力結果は、ラベル付与部(\ref{subsec:label_link_processing}節で後述)で用いる。
 
 \subsection{文字情報取得用画像処理}\label{subsec:image_processing_for_char_recognition}
-文字情報取得用画像処理は、文字情報取得処理(\ref{subsec:char_recognition_processing}節で後述)の実行にあたり、文字の認識精度を高めるため、以下の順で帳票画像に画像処理を施す。
+文字情報取得用画像処理は、文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節で後述)の実行にあたり、文字の認識精度を高めるため、以下の順で帳票画像に画像処理を施す。
 
 \begin{enumerate}
     \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
@@ -336,6 +336,7 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 \begin{enumerate}
     \item 除外判定処理(\ref{subsec:exclusion_judgement_processing}節を参照)の出力である除外判定後の取得文字を受け取る。
     \item 以下のプロンプトを入力として属性を推測する。なお、(取得文字)は、除外判定後の取得文字を指す。\\
+    \begin{quotation}
         \# 命令書:\\
         以下の制約条件にあてはまるものを出力せよ。
         
@@ -345,7 +346,7 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
         ・例として、年月日などは日付、氏名などは文字列、金額などは数値があてはまる。\\
         
         (取得文字)という欄は、どのデータ型に該当するか。
-
+    \end{quotation}
     \item 以下の順で処理を行い、属性を補正する。
         \begin{enumerate}
             \item 全文字の属性を文字列(string)とする。
@@ -388,7 +389,7 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 
 図\ref{fig:output_Youri}で示したYouriの出力から、属性を補正した結果を、図\ref{fig:predict_att_for_original}に示す。
 図\ref{fig:predict_att_for_original}は、左から、\ref{subsec:char_information_obtainment_processing}節で割り振った、ソート後の番号、属性を判定した結果、推測対象である取得文字の順で表す。
-例えば、番号1の取得文字は、「請求日」であり、推測した属性は日付(date)となり、番号4の取得文字は、「」。
+例えば、番号1の取得文字は、「請求日」であり、推測した属性は日付(date)となる。番号4の取得文字は、「月」であり、推測した属性は文字列(string)となる。
 図\ref{fig:predict_att_for_original}の番号は、図\ref{fig:bbox_recognition_for_original}のバウンディングボックスの左上頂点に表示する番号、および図\ref{fig:char_recognition_for_original}で示した番号と一致する。
 なお、大規模言語モデルによる出力によって属性は変化するため、常に正しい属性を判定することはできない。
 例えば、番号1の取得文字である「請求日」の属性は、日付(date)と正しく判定しているが、番号6の取得文字である「御中」の属性は、日付(date)と判定している。

@@ -1,6 +1,4 @@
 \chapter{研究の準備}\label{cha:Preparation}
-(簡単なメモ。途中まで記述。あとで詳しく書くこと)
-
 本章では、本研究に必要な前提知識について説明する。
 
 
@@ -149,7 +147,7 @@ DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用�
 
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
 光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字コードに変換することである\cite{光学文字認識}。
-本研究では、文字情報取得処理(\ref{subsec:char_recognition_processing}節で後述)および文字位置取得処理(\ref{subsec:char_information_obtainment_processing}節で後述)で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
+本研究では、文字情報取得処理(\ref{subsec:char_information_obtainment_processing}で後述)で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
 また、本研究では、光学文字認識ソフトウェア\cite{光学文字認識ソフトウェア}であるTesseract-OCRを、PythonのOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から用いる。
 PyOCRを用いることにより、文字を認識する処理にbuilderという変数をパラメータとして指定できる。
 本研究では、LineBoxBuilderを変数builderに指定し、行単位で文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する。
