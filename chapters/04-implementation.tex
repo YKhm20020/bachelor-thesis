@@ -40,7 +40,8 @@
     \item OpenCVのgetStructuringElement関数(\ref{sec:OpenCV}節を参照)を用いたカーネルの作成\\
         5行5列の矩形カーネルを作成する。
     \item OpenCVのdilate関数(\ref{sec:OpenCV}節を参照)を用いた膨張処理\\
-        getStructuringElement関数で作成した矩形カーネルを用いて、。
+        getStructuringElement関数で作成した矩形カーネルを用いる。
+        膨張処理で矩形の辺を太くすることで、検出精度を高める。
         なお、膨張する回数は1回とする。
 \end{enumerate}
 
@@ -95,9 +96,9 @@
 
 \begin{enumerate}
     \item OpenCVのcvtColor関数を用いた帳票画像のグレースケール化\\
-        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理
+        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理。
     \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
-        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理
+        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理。
     \item OpenCVのthreshold関数を用いた大津の二値化による二値画像への変換\\
         大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_BINARY\_INVに指定し、二値化する。
         ハフ変換は白線を検出する処理であるため、白黒を反転して二値化することにより、黒色の直線を白色とし、検出精度を高める。
@@ -140,8 +141,8 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 文字情報取得用画像処理は、この後の処理である文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節で後述)を実行するための前処理として、文字の認識精度を高めるため、以下の順で帳票画像に画像処理を施す。
 
 \begin{enumerate}
-    \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
-        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理
+    \item DeblurGANv2の適用によるブレ除去後の帳票画像の生成\\
+        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理。
     \item 領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)から、領域座標を取得する。
     \item 背景色のRGBの値を取得\\
         背景色は、画像内で占める面積が最も広い色であるとする。
@@ -153,7 +154,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
     \item OpenCVのimwrite関数を用いた、画像の保存\\
         背景色で矩形と直線を描画した画像を保存し、処理対象の画像を、入力である帳票画像から変更する。
     \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化\\
-        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理
+        \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理。
     \item OpenCVのthreshold関数を用いた、大津の二値化による二値画像への変換\\
         大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_BINARYに指定し、二値化する。
 \end{enumerate}
@@ -191,7 +192,7 @@ y座標が同じ場合は、さらにx座標を参照し、昇順にソートす
 
 \begin{enumerate}
     \item i番目のバウンディングボックスの左上頂点のy座標を取得する。
-    \item 取得したy座標を基準として、10ピクセル以内に別のバウンディングボックスの左上頂点が存在する場合は、以下の処理を順に行う。
+    \item 取得したy座標を基準として、下10ピクセル以内に別のバウンディングボックスの左上頂点が存在する場合は、以下の処理を順に行う。
     \begin{enumerate}
         \item 条件にあてはまる左上頂点のxy座標全てを、空のリストgroupに格納する。
         \item リストgroup内について、x座標の値を参照して昇順にソートする。
@@ -216,17 +217,20 @@ y座標が同じ場合は、さらにx座標を参照し、昇順にソートす
 
 図\ref{fig:original}に示した帳票画像に対する、文字情報取得処理の出力をまとめたものを、図\ref{fig:char_recognition_for_original}に示す。
 また、図\ref{fig:char_recognition_for_original}で示す文字位置を参照し、バウンディングボックスを描画した画像を、図\ref{fig:bbox_recognition_for_original}に示す。
-図\ref{fig:char_recognition_for_original}で表示している内容を、図に示す。
+図\ref{fig:char_recognition_for_original}で表す内容を、以下に示す。
 
-% \begin{center}
-%     \
+\begin{center}
+    string[A]: ((B, C), (D, E)) : (F)
+\end{center}
 
-% \begin{enumerate}
-%     \item \ref{subsec:char_information_obtainment_processing}節で割り振った、ソート後の番号
-%     \item バウンディングボックスの左上頂点のxy座標
-%     \item バウンディングボックスの右下頂点のxy座標
-%     \item 取得文字
-% \end{enumerate}
+\begin{center}
+    A: ソート後の番号\\
+    B: バウンディングボックスの左上頂点のx座標\\
+    C: バウンディングボックスの左上頂点のy座標\\
+    D: バウンディングボックスの右下頂点のx座標\\
+    E: バウンディングボックスの右下頂点のy座標\\
+    F: 取得文字\\
+\end{center}
 
 例えば、番号1の取得文字は、「請求日」であり、バウンディングボックスの左上頂点のxy座標が、(1597, 321)であり、バウンディングボックスの右下頂点のxy座標が、(1724, 363)となる。
 図\ref{fig:char_recognition_for_original}の番号は、図\ref{fig:bbox_recognition_for_original}のバウンディングボックスの左上に表示する番号と一致する。
@@ -392,7 +396,18 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 \end{figure}
 
 図\ref{fig:output_Youri}で示したYouriの出力から、属性を補正した結果を、図\ref{fig:predict_att_for_original}に示す。
-図\ref{fig:predict_att_for_original}は、左から、\ref{subsec:char_information_obtainment_processing}節で割り振った、ソート後の番号、属性を判定した結果、推測対象である取得文字の順で表す。
+また、図\ref{fig:predict_att_for_original}で表す内容を、以下に示す。
+
+\begin{center}
+    att[A]: B (C)
+\end{center}
+
+\begin{center}
+    A: ソート後の番号\\
+    B: 属性を推測した結果\\
+    C: 推測対象である取得文字\\
+\end{center}
+
 例えば、番号1の取得文字は、「請求日」であり、推測した属性は日付(date)となる。番号4の取得文字は、「月」であり、推測した属性は文字列(string)となる。
 図\ref{fig:predict_att_for_original}の番号は、図\ref{fig:bbox_recognition_for_original}のバウンディングボックスの左上頂点に表示する番号、および図\ref{fig:char_recognition_for_original}で示した番号と一致する。
 なお、大規模言語モデルによる出力に依存して属性を決定するため、常に正しい属性を判定することはできていない。
@@ -442,9 +457,8 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 以上の繰り返し処理を行った後、領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得した領域座標に対して、ラベルを割り付ける。
 
 \section{ファイル出力部}\label{subsec:file_output_part}
-ファイル出力部では、領域座標と、対応するラベルを組とするJSON形式のファイルと、取得領域を強調表示したPNG形式の画像2枚を出力する。
+ファイル出力部では、領域座標と、対応するラベルを組とするJSON形式のファイルと、JSONファイルの取得領域を強調表示したPNG形式の画像2枚を出力する。
 JSONファイルと、PNG画像のエクスポートにあたって、領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得した領域座標と、ラベル割付処理(\ref{subsec:label_link_processing}節を参照)で取得したラベルを参照する。
-
 
 \subsection{JSONファイル出力処理}\label{subsec:json_file_output_processing}
 JSONファイル出力処理では、取得した領域座標とラベルを整形し、領域座標と、対応するラベルを組とするJSONファイルを出力する処理である。

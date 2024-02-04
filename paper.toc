@@ -1,58 +1,58 @@
 \contentsline {chapter}{概要}{1}{chapter*.1}
-\contentsline {chapter}{\numberline {1}はじめに}{2}{chapter.1}
-\contentsline {chapter}{\numberline {2}研究の準備}{4}{chapter.2}
-\contentsline {section}{\numberline {2.1}入力対象の画像}{4}{section.2.1}
-\contentsline {section}{\numberline {2.2}バリデーションチェック}{5}{section.2.2}
-\contentsline {section}{\numberline {2.3}OpenCV}{5}{section.2.3}
-\contentsline {paragraph}{imread関数}{5}{section*.2}
-\contentsline {paragraph}{imwrite関数}{5}{section*.3}
-\contentsline {paragraph}{cvtColor関数}{5}{section*.4}
-\contentsline {paragraph}{getStructuringElement関数}{5}{section*.5}
-\contentsline {paragraph}{GaussianBlur関数}{5}{section*.6}
-\contentsline {paragraph}{threshold関数}{6}{section*.7}
-\contentsline {paragraph}{dilate関数}{7}{section*.8}
-\contentsline {paragraph}{Canny関数}{7}{section*.9}
-\contentsline {paragraph}{findContours関数}{7}{section*.10}
-\contentsline {paragraph}{HoughLinesP関数}{8}{section*.11}
-\contentsline {paragraph}{drawContours関数}{8}{section*.12}
-\contentsline {paragraph}{putText関数}{9}{section*.13}
-\contentsline {section}{\numberline {2.4}DeblurGANv2}{9}{section.2.4}
-\contentsline {section}{\numberline {2.5}光学文字認識}{9}{section.2.5}
-\contentsline {section}{\numberline {2.6}Fugashi}{10}{section.2.6}
-\contentsline {section}{\numberline {2.7}Youri}{10}{section.2.7}
-\contentsline {chapter}{\numberline {3}本ツールの機能}{11}{chapter.3}
-\contentsline {section}{\numberline {3.1}ラベル付き領域座標取得機能}{13}{section.3.1}
-\contentsline {subsection}{\numberline {3.1.1}矩形領域取得}{14}{subsection.3.1.1}
-\contentsline {subsection}{\numberline {3.1.2}下線部領域取得}{14}{subsection.3.1.2}
-\contentsline {subsection}{\numberline {3.1.3}文字情報取得}{14}{subsection.3.1.3}
-\contentsline {subsection}{\numberline {3.1.4}属性推測}{14}{subsection.3.1.4}
-\contentsline {subsection}{\numberline {3.1.5}ラベル割付}{15}{subsection.3.1.5}
-\contentsline {section}{\numberline {3.2}領域強調画像出力機能}{15}{section.3.2}
-\contentsline {chapter}{\numberline {4}本ツールの実装}{21}{chapter.4}
-\contentsline {section}{\numberline {4.1}領域座標取得部}{21}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}矩形領域座標取得用画像処理}{21}{subsection.4.1.1}
-\contentsline {subsection}{\numberline {4.1.2}矩形領域座標取得処理}{23}{subsection.4.1.2}
-\contentsline {subsection}{\numberline {4.1.3}下線部領域座標取得用画像処理}{23}{subsection.4.1.3}
-\contentsline {subsection}{\numberline {4.1.4}下線部領域座標取得処理}{24}{subsection.4.1.4}
-\contentsline {section}{\numberline {4.2}文字情報取得部}{25}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}文字情報取得用画像処理}{25}{subsection.4.2.1}
-\contentsline {subsection}{\numberline {4.2.2}文字情報取得処理}{26}{subsection.4.2.2}
+\contentsline {chapter}{\numberline {1}はじめに}{3}{chapter.1}
+\contentsline {chapter}{\numberline {2}研究の準備}{5}{chapter.2}
+\contentsline {section}{\numberline {2.1}入力対象の画像}{5}{section.2.1}
+\contentsline {section}{\numberline {2.2}バリデーションチェック}{6}{section.2.2}
+\contentsline {section}{\numberline {2.3}OpenCV}{6}{section.2.3}
+\contentsline {paragraph}{imread関数}{6}{section*.2}
+\contentsline {paragraph}{imwrite関数}{6}{section*.3}
+\contentsline {paragraph}{cvtColor関数}{6}{section*.4}
+\contentsline {paragraph}{getStructuringElement関数}{6}{section*.5}
+\contentsline {paragraph}{GaussianBlur関数}{6}{section*.6}
+\contentsline {paragraph}{threshold関数}{7}{section*.7}
+\contentsline {paragraph}{dilate関数}{8}{section*.8}
+\contentsline {paragraph}{Canny関数}{8}{section*.9}
+\contentsline {paragraph}{findContours関数}{8}{section*.10}
+\contentsline {paragraph}{HoughLinesP関数}{9}{section*.11}
+\contentsline {paragraph}{drawContours関数}{9}{section*.12}
+\contentsline {paragraph}{putText関数}{10}{section*.13}
+\contentsline {section}{\numberline {2.4}DeblurGANv2}{10}{section.2.4}
+\contentsline {section}{\numberline {2.5}光学文字認識}{10}{section.2.5}
+\contentsline {section}{\numberline {2.6}Fugashi}{11}{section.2.6}
+\contentsline {section}{\numberline {2.7}Youri}{11}{section.2.7}
+\contentsline {chapter}{\numberline {3}本ツールの機能}{12}{chapter.3}
+\contentsline {section}{\numberline {3.1}領域座標取得およびラベル付与機能}{14}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}矩形領域取得}{15}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}下線部領域取得}{15}{subsection.3.1.2}
+\contentsline {subsection}{\numberline {3.1.3}文字情報取得}{15}{subsection.3.1.3}
+\contentsline {subsection}{\numberline {3.1.4}属性推測}{15}{subsection.3.1.4}
+\contentsline {subsection}{\numberline {3.1.5}ラベル割付}{16}{subsection.3.1.5}
+\contentsline {section}{\numberline {3.2}領域強調画像出力機能}{16}{section.3.2}
+\contentsline {chapter}{\numberline {4}本ツールの実装}{22}{chapter.4}
+\contentsline {section}{\numberline {4.1}領域座標取得部}{22}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}矩形領域座標取得用画像処理}{22}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}矩形領域座標取得処理}{24}{subsection.4.1.2}
+\contentsline {subsection}{\numberline {4.1.3}下線部領域座標取得用画像処理}{24}{subsection.4.1.3}
+\contentsline {subsection}{\numberline {4.1.4}下線部領域座標取得処理}{25}{subsection.4.1.4}
+\contentsline {section}{\numberline {4.2}文字情報取得部}{26}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}文字情報取得用画像処理}{26}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}文字情報取得処理}{27}{subsection.4.2.2}
 \contentsline {subsection}{\numberline {4.2.3}除外判定処理}{29}{subsection.4.2.3}
-\contentsline {section}{\numberline {4.3}ラベル付与部}{29}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}属性推測処理}{30}{subsection.4.3.1}
-\contentsline {subsection}{\numberline {4.3.2}ラベル割付処理}{31}{subsection.4.3.2}
-\contentsline {section}{\numberline {4.4}ファイル出力部}{32}{section.4.4}
-\contentsline {subsection}{\numberline {4.4.1}JSONファイル出力処理}{32}{subsection.4.4.1}
-\contentsline {subsection}{\numberline {4.4.2}領域強調画像出力処理}{33}{subsection.4.4.2}
-\contentsline {chapter}{\numberline {5}適用例}{37}{chapter.5}
-\contentsline {section}{\numberline {5.1}矩形領域についての出力結果}{37}{section.5.1}
-\contentsline {section}{\numberline {5.2}下線部領域についての出力結果}{38}{section.5.2}
-\contentsline {chapter}{\numberline {6}考察}{45}{chapter.6}
-\contentsline {section}{\numberline {6.1}本ツールの有用性に関する評価}{45}{section.6.1}
-\contentsline {subsection}{\numberline {6.1.1}電子フォーム記入欄の配置完了までにかかる時間に関する評価}{48}{subsection.6.1.1}
-\contentsline {subsection}{\numberline {6.1.2}配置した電子フォーム記入欄の精度に関する評価}{49}{subsection.6.1.2}
-\contentsline {section}{\numberline {6.2}関連ツール}{50}{section.6.2}
-\contentsline {section}{\numberline {6.3}本ツールの問題点}{50}{section.6.3}
-\contentsline {chapter}{\numberline {7}おわりに}{55}{chapter.7}
-\contentsline {chapter}{謝辞}{57}{chapter*.46}
-\contentsline {chapter}{参考文献}{58}{chapter*.47}
+\contentsline {section}{\numberline {4.3}ラベル付与部}{31}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}属性推測処理}{31}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}ラベル割付処理}{33}{subsection.4.3.2}
+\contentsline {section}{\numberline {4.4}ファイル出力部}{33}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}JSONファイル出力処理}{34}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}領域強調画像出力処理}{34}{subsection.4.4.2}
+\contentsline {chapter}{\numberline {5}適用例}{39}{chapter.5}
+\contentsline {section}{\numberline {5.1}矩形領域についての出力結果}{39}{section.5.1}
+\contentsline {section}{\numberline {5.2}下線部領域についての出力結果}{41}{section.5.2}
+\contentsline {chapter}{\numberline {6}考察}{47}{chapter.6}
+\contentsline {section}{\numberline {6.1}本ツールの有用性に関する評価}{47}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}電子フォーム記入欄の配置完了までにかかる時間に関する評価}{50}{subsection.6.1.1}
+\contentsline {subsection}{\numberline {6.1.2}配置した電子フォーム記入欄の精度に関する評価}{50}{subsection.6.1.2}
+\contentsline {section}{\numberline {6.2}関連ツール}{52}{section.6.2}
+\contentsline {section}{\numberline {6.3}本ツールの問題点}{52}{section.6.3}
+\contentsline {chapter}{\numberline {7}おわりに}{57}{chapter.7}
+\contentsline {chapter}{謝辞}{59}{chapter*.46}
+\contentsline {chapter}{参考文献}{60}{chapter*.47}
