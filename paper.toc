@@ -29,7 +29,7 @@
 \contentsline {subsection}{\numberline {3.1.4}属性推測}{18}{subsection.3.1.4}
 \contentsline {subsection}{\numberline {3.1.5}ラベル割付}{19}{subsection.3.1.5}
 \contentsline {section}{\numberline {3.2}領域強調画像出力機能}{19}{section.3.2}
-\contentsline {chapter}{\numberline {4}本提案手法の実装}{25}{chapter.4}
+\contentsline {chapter}{\numberline {4}提案手法の実現}{25}{chapter.4}
 \contentsline {section}{\numberline {4.1}領域座標取得部}{25}{section.4.1}
 \contentsline {subsection}{\numberline {4.1.1}矩形領域座標取得用画像処理}{25}{subsection.4.1.1}
 \contentsline {subsection}{\numberline {4.1.2}矩形領域座標取得処理}{27}{subsection.4.1.2}
@@ -53,6 +53,6 @@
 \contentsline {subsection}{\numberline {6.1.1}電子フォーム記入欄の配置完了までにかかる時間に関する評価}{52}{subsection.6.1.1}
 \contentsline {subsection}{\numberline {6.1.2}配置した電子フォーム記入欄の精度に関する評価}{54}{subsection.6.1.2}
 \contentsline {section}{\numberline {6.2}関連ツール}{55}{section.6.2}
-\contentsline {section}{\numberline {6.3}本ツールの問題点}{55}{section.6.3}
+\contentsline {section}{\numberline {6.3}試作したツールの問題点}{55}{section.6.3}
 \contentsline {chapter}{\numberline {7}おわりに}{60}{chapter.7}
 \contentsline {chapter}{謝辞}{63}{chapter*.47}

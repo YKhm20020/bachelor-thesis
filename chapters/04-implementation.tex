@@ -1,14 +1,14 @@
-\chapter{本提案手法の実装}\label{cha:Implementation}
+\chapter{提案手法の実現}\label{cha:Implementation}
 提案手法を試行するために、帳票画像内における記入欄の領域座標とその記入欄に入力する内容のデータ型をまとめたJSONファイルに加えて、検知した記入欄を強調表示した画像2枚を出力するツールを試作する。
 試作するツールは、領域座標取得部、文字情報取得部、ラベル付与部、ファイル出力部の4つの処理部で構成する。
-本ツールの構成を、図\ref{fig:structure}に示す。
+試作したツールの構成を、図\ref{fig:structure}に示す。
 
 以降、本章では4つの処理部について説明する。
 
 \begin{figure}[t]
     \begin{center}
         \includegraphics[width=15cm]{image/04-implementation/structure.jpg}
-        \caption{本ツールの構造}
+        \caption{試作したツールの構造}
         \label{fig:structure}
     \end{center}
 \end{figure}
@@ -22,7 +22,7 @@
 % 矩形
 \subsection{矩形領域座標取得用画像処理}\label{subsec:image_processing_for_rect_coords_obtainment}
 矩形領域座標取得用画像処理は、この後の処理である、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節で後述)を実行するための前処理として、画像処理を行う。
-本ツールでは、矩形の取得にあたり、OpenCVのfindContours関数(\ref{sec:OpenCV}節を参照)を用いる。
+試作したツールでは、矩形の取得にあたり、OpenCVのfindContours関数(\ref{sec:OpenCV}節を参照)を用いる。
 この関数を呼び出すとき、第一引数に渡すパスが示す処理画像の全ての画素が白色または黒色でなければエラーが発生してしまうため、処理画像を二値化する必要がある。
 また、矩形の検出精度を高めるため、後述する画像処理を組み合わせ、二値化する。
 
@@ -64,7 +64,7 @@
 % 下線部
 \subsection{下線部領域座標取得用画像処理}\label{subsec:image_processing_for_underline_coords_obtainment}
 下線部領域座標取得用画像処理は、この後の処理である下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)を実行するための前処理として、画像処理を行う。
-本ツールでは、下線部の取得にあたり、OpenCVのHoughLinesP関数(\ref{sec:OpenCV}節を参照)による、ハフ変換を用いた直線検出を行う。
+試作したツールでは、下線部の取得にあたり、OpenCVのHoughLinesP関数(\ref{sec:OpenCV}節を参照)による、ハフ変換を用いた直線検出を行う。
 この関数を呼び出すとき、第一引数に渡すパスが示す処理画像の全ての画素が白色または黒色でなければエラーが発生してしまうため、処理画像を二値化する必要がある。
 また、直線の検出精度を高めるため、後述する画像処理を組み合わせ、二値化する。
 
@@ -111,7 +111,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 
 \section{文字情報取得部}\label{sec:OCR_part}
 文字情報取得部では、光学文字認識(\ref{sec:Optical-Charactor-Recognition}節を参照)によって、帳票画像内の文字情報を取得する。
-本ツールでは、光学文字認識ソフトTesseract-OCR\cite{Tesseract-OCR}を用いる。
+試作したツールでは、光学文字認識ソフトTesseract-OCR\cite{Tesseract-OCR}を用いる。
 文字情報取得部の出力結果は、ラベル付与部(\ref{subsec:label_link_processing}節で後述)で用いる。
 
 \subsection{文字情報取得用画像処理}\label{subsec:image_processing_for_char_recognition}
@@ -128,7 +128,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
     \item OpenCVのdrawContours関数と、OpenCVのline関数を用いた、背景色での矩形領域と下線部領域の描画\\
         矩形領域はdrawContours関数(\ref{sec:OpenCV}節を参照)を用いて矩形を、下線部領域はOpenCVのline関数(\ref{sec:OpenCV}節を参照)を用いて直線を、背景色でそれぞれ描画することによって、文字でない黒色の画素を減らす。
         これにより、文字でない黒色の画素値によって、大津の二値化で計算する閾値が変化することを防ぐ。
-        本ツールでは、太さ15ピクセルの矩形と直線を描画する。
+        試作したツールでは、太さ15ピクセルの矩形と直線を描画する。
     \item OpenCVのimwrite関数を用いた、画像の保存\\
         背景色で矩形と直線を描画した画像を保存し、処理対象の画像を、入力である帳票画像から変更する。
     \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化\\
@@ -140,7 +140,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 \subsection{文字情報取得処理}\label{subsec:char_information_obtainment_processing}
 文字情報取得処理は、文字情報を取得する処理である。
 \ref{subsec:image_processing_for_char_recognition}節の画像処理後、Tesseract-OCRによる文字認識を行う。
-本ツールでは、PythonのOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から、変数builderにLineBoxBuilderを指定し、行単位で文字認識を行う。
+試作したツールでは、PythonのOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から、変数builderにLineBoxBuilderを指定し、行単位で文字認識を行う。
 これによって、取得文字と文字位置を行単位で取得することができる。
 
 文字情報取得後、バウンディングボックスの左上頂点のy座標を参照し、昇順にソートし、番号を0から順に割り振る。
@@ -326,7 +326,7 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 \begin{enumerate}
     \item 除外判定処理(\ref{subsec:exclusion_judgement_processing}節を参照)の出力である除外判定後の取得文字を受け取る。
     \item 以下のプロンプトを入力として属性を推測する。なお、(取得文字)は、除外判定後の取得文字を指す。\\
-    \begin{quotation}
+    \begin{quote}
         \# 命令書:\\
         以下の制約条件にあてはまるものを出力せよ。
         
@@ -335,7 +335,7 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
         ・出力は短く、あてはまるデータ型のみとする。\\
         ・例として、年月日などは日付、氏名などは文字列、金額などは数値があてはまる。\\
         (取得文字)という欄は、どのデータ型に該当するか。
-    \end{quotation}
+    \end{quote}
     \item 以下の順で処理を行い、属性を補正する。
         \begin{enumerate}
             \item 全文字の属性を文字列(string)とする。
