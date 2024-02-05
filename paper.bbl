@@ -1,0 +1,170 @@
+\begin{thebibliography}{10}
+
+\bibitem{電子帳簿保存法}
+電子帳簿保存制度特設サイト.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{デジタルデータの経済的価値の計測と活用の現状に関する調査研究}
+令和2年版 情報通信白書.
+\newblock アクセス日: 2024/02/02.
+
+\bibitem{文書管理実態調査2023}
+Biz Clip.
+\newblock デジタル化、進んでる？ 文書管理実態調査2023.
+\newblock アクセス日: 2024/02/02.
+
+\bibitem{電子フォーム}
+曽根直人, 林秀彦, and 菊地章.
+\newblock 電子フォームを用いた申請書処理の効率化.
+\newblock {\em 鳴門教育大学情報教育ジャーナル}, 5:29--34, 2008.
+
+\bibitem{i-Reporter}
+【i-reporter】シェアno.1の現場帳票電子化システム -
+  多彩な機能の現場帳票システム.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{Create!Form}
+帳票ツールのcreate!form | インフォテック株式会社.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{バリデーションチェック}
+バリデーション.
+
+\bibitem{電子文書と電子化文書}
+電子文書とは？電子化文書の比較とメリット、注意点を解説！
+\newblock アクセス日: 2024/01/09.
+
+\bibitem{OpenCV}
+opencv.
+\newblock アクセス日: 2024/01/09.
+
+\bibitem{getStructuringElement関数}
+画像フィルタリング — opencv 2.2 documentation.
+\newblock アクセス日: 2024/01/15.
+
+\bibitem{ガウシアンフィルタ}
+画像の平滑化.
+\newblock アクセス日: 2024/01/10.
+
+\bibitem{大津の二値化}
+大津展之.
+\newblock 認識問題としての二値化と各種方法の検討.
+\newblock {\em 1980年電子情報通信学会論文誌},
+  Vol.J63-D(No.4):349--356, 1980.
+
+\bibitem{画素値}
+8ビットと16ビットイメージ.
+\newblock アクセス日: 2024/01/11.
+
+\bibitem{膨張処理}
+モルフォロジー演算のタイプ.
+\newblock アクセス日: 2024/01/10.
+
+\bibitem{エッジ検出}
+Edge detection using opencv.
+\newblock アクセス日: 2024/01/10.
+
+\bibitem{Canny法}
+Canny法によるエッジ検出.
+\newblock アクセス日: 2024/01/10.
+
+\bibitem{輪郭検出}
+輪郭: 初めの一歩.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{ハフ変換}
+ハフ変換.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{HoughLinesP関数の引数}
+Feature detection.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{輪郭描画}
+Opencv: Contours : Getting started.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{DeblurGANv2}
+Orest Kupyn, Tetiana Martyniuk, Junru Wu, and Zhangyang Wang.
+\newblock Deblurgan-v2: Deblurring (orders-of-magnitude) faster and better.
+\newblock In {\em The IEEE International Conference on Computer Vision (ICCV)},
+  pages 8878--8887, 2019.
+
+\bibitem{Tesseract-OCR}
+tesseract.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{DeblurGANv2の先行研究}
+Emilda Zhang, Vincent~Ardyan Putra, and Gede~Putra Kusuma.
+\newblock Improving optical character recognition accuracy for indonesia
+  identification card using generative adversarial network.
+\newblock {\em Journal of Theoretical and Applied Information Technology},
+  Vol.100(8):2424--2437, 2022.
+
+\bibitem{光学文字認識}
+比留川翔哉 and 丸山一貴.
+\newblock 本の厚みによる歪みを考慮した光学文字認識.
+\newblock pages 81--86, 2019.
+
+\bibitem{光学文字認識ソフトウェア}
+Ocr (光学文字認識) とは.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{Python}
+Python 3.7.10.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{PyOCR}
+pyocr.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{Mecab}
+Mecab: Yet another part-of-speech and morphological analyzer.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{Fugashi}
+Paul McCann.
+\newblock fugashi, a tool for tokenizing japanese in python.
+\newblock In {\em Proceedings of Second Workshop for NLP Open Source Software
+  (NLP-OSS)}, pages 44--51, 2020.
+
+\bibitem{UniDic}
+「unidic」国語研短単位自動解析用辞書.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{UniDic品詞体系}
+Unidic version 1.3.9 ユーザーズマニュアル.
+\newblock アクセス日: 2024/01/09.
+
+\bibitem{Llama2}
+Llama2 - meta ai.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{Youri}
+rinna、llama 2の日本語継続事前学習モデル「youri 7b」を公開.
+\newblock アクセス日: 2024/01/09.
+
+\bibitem{IoU閾値}
+井筒竜宇, 矢吹信喜, and 福田知弘.
+\newblock
+  深層学習を用いた鋼骨組構造における出来形検出に関する基礎的検討.
+\newblock {\em 土木学会論文集F3(土木情報学)}, Vol.75(2):94--105,
+  2019.
+
+\bibitem{Photolize}
+Photolize（フォトライズ）.
+\newblock アクセス日: 2024/01/29.
+
+\bibitem{kintone}
+kintone.
+\newblock アクセス日: 2024/02/02.
+
+\bibitem{PrintCreator}
+Printcreator.
+\newblock アクセス日: 2024/02/03.
+
+\bibitem{k-Report}
+k-report | kintoneに高機能帳票機能を.
+\newblock アクセス日: 2024/02/03.
+
+\end{thebibliography}

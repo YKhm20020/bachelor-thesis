@@ -20,6 +20,7 @@
 \usepackage{colortbl}
 \usepackage[dvipdfmx, hidelinks]{hyperref} % リンクを付けてくれる。
 \usepackage{pxjahyper}          % リンクを付けてくれる（日本語）
+\usepackage{natbib}
 
 % ソースコードの設定
 \lstset{
@@ -70,39 +71,52 @@
 
 2019年4月に電子帳簿保存法が改正され、帳簿書類の電子データ保存が義務付けられたことにより、帳簿書類の電子化が推進されている。
 また、総務省の令和2年版「情報通信白書」では、60.4\%の企業が社内業務のペーパーレス化に取り組んでいると答えた。
-しかし、Biz Clipによる文書管理実態調査2023によると、紙の文書が介在する業務工程のうち、契約・申請書類は、22023年時点で66.5\%、2023年で59.1\%であるという結果となり、特に契約書や請求書といった帳票は、比較的に紙媒体が多いことがわかった。
+しかし、Biz Clipの文書管理実態調査2023によると、紙の文書が介在する業務工程のうち、契約・申請書類は、2020年時点で66.5\%、2023年時点で59.1\%であり、特に契約書や請求書といった帳票は、比較的に紙媒体が多いことがわかった。
 
 帳票の電子化は、スキャナや写真などで帳票を撮影することで実現できる。
 しかし、帳票に記入した内容は、人が目視で確認する必要がある。
 効率的に記入内容を管理するためには、その記入内容をデータとして保存する必要がある。
 その方法の1つとして、電子フォームを用いる方法がある。
-電子フォームとは、従来紙の帳票で行っていた申請などの業務を電子化し、アプリケーションを介して入力した項目をそのまま業務用のデータとして利用するための仕組みである。
-電子フォームを用いることで、記入内容をデータとして保存することができる。
+電子フォームとは、従来紙の帳票で行っていた申請などの業務に用いる帳票を電子化し、アプリケーションを介して入力した項目をそのまま業務用のデータとして利用するための仕組みである。
+電子フォームを用いることによって、記入内容をデータとして保存できる。
 しかし、電子フォームを作成するには、以下の2つの課題がある。
 
 \begin{itemize}
   \item 電子フォームの作成に時間がかかる
-  \item 使い慣れた既存の帳票のレイアウトが変更となる場合がある
+  \item 使い慣れた既存の帳票のレイアウトが変わる場合がある
 \end{itemize}
 
 これらの課題を解決するため、電子フォームを自動作成するツールやサービスがある。
-既存の電子フォーム作成ツールは、Excelファイルを入力とすることにより、記入欄の位置を取得することができ、セルに設定した書式設定を保持した状態で、電子フォームを自動で作成できる。
-しかし、Excelファイルを入力とした場合は、レイアウトが変更となる可能性がある。
-また、画像ファイルを入力とした場合は、入力する画像を背景とするため、レイアウトは変更とならないが、マウス操作で記入欄を配置する必要があるため、手間と時間がかかる。
+既存の電子フォーム作成ツールである、i-ReporterやCreate!Formは、Excelファイルを入力とすることにより、記入欄の位置を取得することができ、セルに設定した書式設定を保持した状態で、電子フォームを自動で作成できる。
+しかし、Excelファイルを入力とした場合は、レイアウトが変わる可能性がある。
+また、画像ファイルを入力とした場合は、入力する画像を背景とするため、レイアウトは変わらないが、GUIツールを用いたマウス操作で記入欄を配置する必要があるため、手間と時間がかかる。
 さらに、書式についての情報がないため、記入欄に書式の設定をすることができない。
 
-そこで本研究は、前述した2つの課題点を同時に解決するため、帳票画像内における記入欄の領域座標、および、その記入欄に入力する内容のデータ型をまとめたJSONファイルに加えて、検知した記入欄を強調表示した画像2枚を出力する、記入欄の検出およびラベル付与手法を提案する。
+そこで本研究は、電子フォームの作成にあたって、使い慣れたレイアウトを変更せず、作成に必要な手間と時間を削減することを目的として、帳票画像内における記入欄の領域座標とその記入欄に入力する内容のデータ型をまとめたJSONファイルに加えて、検知した記入欄を強調表示した画像2枚を出力する、記入欄の検出およびラベル付与手法を提案する。
 まず、帳票画像内にある記入欄の位置を取得するために、記入欄を画像処理によって検出する。
 次に、検出した記入欄に入力する内容のデータ型を決定するために、入力内容を示す文字を認識し、大規模言語モデルを用いて、記入する内容が、日付(date)、文字列(string)、数値(number)の3種類のうちいずれかを、ラベルとして割り付ける。
 そして、取得した記入欄の領域座標を参照して、帳票画像に色を付けて描画することで、取得した記入欄を強調表示した画像を出力する。
-記入欄の検出およびラベル付与手法の提案を実現するための手段として、これらの処理を行うツールを作成した。
+本研究では、提案する記入欄の検出およびラベル付与手法を試行するために、これらの処理を行うツールを試作した。
+試作したツールは、以下の2つの機能を持つ。
 
-適用例を用いて、本ツールが領域座標の取得と、ラベル割付が一部を除いて正常に動作することを確認した。
+\begin{itemize}
+  \item 領域座標取得およびラベル付与機能\\
+      領域座標取得およびラベル付与機能は、帳票画像中の矩形領域および下線部領域について、領域座標を電子フォーム記入欄として取得し、それぞれにラベルを割り付ける機能である。
+      ラベルを割り付けることにより、バリデーションチェックに必要な情報を付与することができる。
+  \item 領域強調画像出力機能\\
+      領域強調画像出力機能は、入力である帳票画像に対して、取得した領域座標とラベルを描画することによって、強調表示したPNG画像を出力する機能である。
+      これによって、領域座標取得およびラベル付与機能で出力したJSONファイルの内容を、目視で確認しやすくなる。
+      本機能で出力する画像は、矩形領域を強調した矩形領域強調画像と、下線部領域を強調した下線部領域強調画像の計2枚である。
+\end{itemize}
+
+適用例を用いて、試作したツールが領域座標の取得と、ラベル割付が一部を除いて正常に動作することを確認した。
 なお、正常に動作しない原因は、文字認識が失敗したことによって、想定とは異なるラベルを領域座標に割り付けたことや、記入する内容を示す文字が、帳票画像記入欄の右にあることによって、領域座標の右にある文字の属性を参照しないためであることを確認した。
 また、JSONファイルの内容と、2枚の領域強調画像が正しく対応した状態で出力することを確認した。
 
-本ツールの有用性を評価するため、実験を行い、電子フォーム記入欄を配置するまでにかかる時間を削減できたことを確認した。
-また、本ツールの出力について、精度を確認するため、領域座標とラベルの、それぞれの適合率と再現率を評価し、削減した時間に対して、修正する必要がある電子フォーム記入欄の割合が妥当であることを確認した。
+試作したツールの有用性を評価するため、電子フォーム記入欄を配置するまでにかかる時間を計測する実験を行った。
+ある帳票画像2枚について、試作したツールを適用することによって、GUIツールのみを用いた場合と比較して、それぞれ平均で4分46秒(約54.17\%)、2分42秒(約37.41\%)短いことから、電子フォーム記入欄を配置するまでにかかる時間を削減できることを確認した。
+また、試作ツールの出力について、精度を確認するため、領域座標とラベルの、それぞれの適合率と再現率を評価した。
+領域座標およびラベルの再現率は、適合率以上の割合であることから、電子フォーム記入欄の削除による修正回数が、配置による修正回数と比較して多いことが推測できるため、手間を削減できることを確認した。
 
 以上のことから、本研究で提案した手法は、電子フォーム作成にかかる手間と時間の削減に有用であると言える。
 
@@ -157,46 +171,49 @@
 %%
 %参考文献
 %
-\begin{thebibliography}{0}
-  \bibitem{電子帳簿保存法}国税庁: "電子帳簿保存制度特設サイト"\\\url{https://www.nta.go.jp/law/joho-zeikaishaku/sonota/jirei/tokusetsu/index.htm}\\アクセス日: 2024/01/28.
-  \bibitem{デジタルデータの経済的価値の計測と活用の現状に関する調査研究}総務省: "令和2年版 情報通信白書"\\\url{https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r02/html/nd132110.html}\\アクセス日: 2024/02/02.
-  \bibitem{文書管理実態調査2023}Biz Clip: "デジタル化、進んでる？ 文書管理実態調査2023"\\\url{https://www.bizclip.ntt-west.co.jp/articles/bcl00014-039.html}\\アクセス日: 2024/02/02.
-  \bibitem{電子フォーム}曽根直人，林秀彦，菊地章: "電子フォームを用いた申請書処理の効率化", 鳴門教育大学情報教育ジャーナル5, 29-34, 2008
-  \bibitem{i-Reporter}i-reporter.jp: "【i-Reporter】シェアNo.1の現場帳票電子化システム - 多彩な機能の現場帳票システム"\\\url{https://i-reporter.jp/}\\アクセス日: 2024/01/28.
-  \bibitem{Create!Form}Create!Form: "帳票ツールのCreate!Form | インフォテック株式会社""\\\url{https://www.createform.jp/}\\アクセス日: 2024/01/28.
-  \bibitem{電子文書と電子化文書}株式会社マネーフォワード: "電子文書とは？電子化文書の比較とメリット、注意点を解説！"\\\url{https://biz.moneyforward.com/contract/basic/2035/}\\アクセス日: 2024/01/09.
-  \bibitem{バリデーションチェック}ZDNET Japan: "バリデーション"\\url{https://japan.zdnet.com/glossary/exp/バリデーション/?s=4}
-  \bibitem{OpenCV}OpenCV: "opencv"\\\url{https://github.com/opencv/opencv/blob/master/LICENSE}\\アクセス日: 2024/01/09.
-  \bibitem{getStructuringElement関数}OpenCV.jp: "画像フィルタリング — opencv 2.2 documentation"\\\url{http://opencv.jp/opencv-2svn/cpp/image_filtering.html}\\アクセス日: 2024/01/15.
-  \bibitem{ガウシアンフィルタ}鳥取大学 OpenCV-Pythonチュートリアル: "画像の平滑化"\\\url{http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_filtering/py_filtering.html}\\アクセス日: 2024/01/10.
-  \bibitem{大津の二値化}大津展之: "認識問題としての二値化と各種方法の検討", 1980年電子情報通信学会論文誌 Vol.J63-D No.4, pp.349-356, 1980
-  \bibitem{画素値}MathWorks: "8ビットと16ビットイメージ"\\\url{https://jp.mathworks.com/help/matlab/creating_plots/working-with-8-bit-and-16-bit-images.html}\\アクセス日: 2024/01/11.
-  \bibitem{膨張処理}MathWorks: "モルフォロジー演算のタイプ"\\\url{https://jp.mathworks.com/help/images/morphological-dilation-and-erosion.html}\\アクセス日: 2024/01/10.
-  \bibitem{エッジ検出}LearnOpenCV: "Edge Detection Using OpenCV"\\\url{https://learnopencv.com/edge-detection-using-opencv/}\\アクセス日: 2024/01/10.
-  \bibitem{Canny法}鳥取大学 OpenCV-Pythonチュートリアル: "Canny法によるエッジ検出"\\\url{http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_canny/py_canny.html}\\アクセス日: 2024/01/10.
-  \bibitem{輪郭検出}鳥取大学 OpenCV-Pythonチュートリアル: "輪郭: 初めの一歩"\\\url{http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_contours/py_contours_begin/py_contours_begin.html#contours-getting-started}\\アクセス日: 2024/01/28.
-  \bibitem{ハフ変換}MathWorks: "ハフ変換"\\\url{https://jp.mathworks.com/discovery/image-transform.html}\\アクセス日: 2024/01/28.
-  \bibitem{HoughLinesP関数の引数}OpenCV: "Feature Detection"\\\url{https://docs.opencv.org/3.4/dd/d1a/group__imgproc__feature.html#ga8618180a5948286384e3b7ca02f6feeb}\\アクセス日: 2024/01/28.
-  \bibitem{輪郭描画}OpenCV: "OpenCV: Contours : Getting Started"\\\url{https://docs.opencv.org/3.4/d4/d73/tutorial_py_contours_begin.html}\\アクセス日: 2024/01/28.
-  \bibitem{DeblurGANv2}Orest Kupyn and Tetiana Martyniuk and Junru Wu and Zhangyang Wang: "DeblurGAN-v2: Deblurring (Orders-of-Magnitude) Faster and Better", The IEEE International Conference on Computer Vision (ICCV), pp.8878-8887, 2019
-  \bibitem{Tesseract-OCR}Tesseract-OCR: "tesseract"\\\url{https://github.com/tesseract-ocr/tesseract}\\アクセス日: 2024/01/29.
-  \bibitem{DeblurGANv2の先行研究}Emilda Zhang,  Vincent Ardyan Putra, and Gede Putra Kusuma: "Improving optical character recognition accuracy for Indonesia identification card using generative adversarial network", Journal of Theoretical and Applied Information Technology Vol.100 No.8, pp.2424-2437, 2022
-  \bibitem{光学文字認識}比留川翔哉, 丸山一貴: "本の厚みによる歪みを考慮した光学文字認識", 情報処理学会 第60回プログラミング・シンポジウム, pp.81-86, 2019
-  \bibitem{光学文字認識ソフトウェア}Amazon Web Services: "OCR (光学文字認識) とは"\\\url{https://aws.amazon.com/jp/what-is/ocr/}\\アクセス日: 2024/01/29.
-  \bibitem{Python}Python: "Python 3.7.10"\\\url{https://www.python.org/downloads/release/python-3710/}\\アクセス日: 2024/01/29.
-  \bibitem{PyOCR}pyocr: "pyocr"\\\url{https://gitlab.gnome.org/World/OpenPaperwork/pyocr}\\アクセス日: 2024/01/29.
-  \bibitem{Mecab}GitHub Pages: "MeCab: Yet Another Part-of-Speech and Morphological Analyzer"\\\url{https://taku910.github.io/mecab/}\\アクセス日: 2024/01/29.
-  \bibitem{Fugashi}McCann, Paul: "fugashi, a Tool for Tokenizing Japanese in Python", Proceedings of Second Workshop for NLP Open Source Software (NLP-OSS), pp.44-51, 2020
-  \bibitem{UniDic}言語資源開発センター: "「UniDic」国語研短単位自動解析用辞書"\\\url{https://clrd.ninjal.ac.jp/unidic/}\\アクセス日: 2024/01/29.
-  \bibitem{UniDic品詞体系}言語資源開発センター: 伝康晴, 山田篤, 小椋秀樹, 小磯花絵, 小木曽智信: "UniDic version 1.3.9 ユーザーズマニュアル"\\\url{https://clrd.ninjal.ac.jp/unidic/UNIDIC_manual.pdf}\\アクセス日: 2024/01/09.
-  \bibitem{Llama2}Meta AI: "Llama2 - Meta AI"\\\url{https://ai.meta.com/llama/}\\アクセス日: 2024/01/29.
-  \bibitem{Youri}rinna: "rinna、Llama 2の日本語継続事前学習モデル「Youri 7B」を公開"\\\url{https://rinna.co.jp/news/2023/10/20231031.html}\\アクセス日: 2024/01/09.
-  \bibitem{IoU閾値}井筒竜宇, 矢吹信喜, 福田知弘: "深層学習を用いた鋼骨組構造における出来形検出に関する基礎的検討", 土木学会論文集F3(土木情報学), Vol.75, No.2, pp.94-105, 2019
-  \bibitem{Photolize}photolize.jp: "Photolize（フォトライズ）"\\\url{https://photolize.jp/}\\アクセス日: 2024/01/29.
-  \bibitem{kintone}kintone（キントーン）: "kintone"\\\url{https://kintone.cybozu.co.jp/}\\アクセス日: 2024/02/02.
-  \bibitem{PrintCreator}トヨクモ: "PrintCreator"\\\url{https://pc.kintoneapp.com/?gad_source=1&gclid=Cj0KCQiAwvKtBhDrARIsAJj-kTj_rrNpIWvq3s2vrW5tr-W9W0XDJ0ZkJM-nKnUcZjjxn130_vxpHbcaAlEnEALw_wcB}\\アクセス日: 2024/02/03.
-  \bibitem{k-Report}k-report.work: "k-Report | kintoneに高機能帳票機能を"\\\url{https://k-report.work/}\\アクセス日: 2024/02/03.
-\end{thebibliography}
+\bibliographystyle{unsrt}   % unsrtは、参考文献を文書中で引用された順に表示
+\bibliography{references}   % referencesはbibのファイル名
+
+% \begin{thebibliography}{0}
+%   \bibitem{電子帳簿保存法}国税庁: "電子帳簿保存制度特設サイト"\\\url{https://www.nta.go.jp/law/joho-zeikaishaku/sonota/jirei/tokusetsu/index.htm}\\アクセス日: 2024/01/28.
+%   \bibitem{デジタルデータの経済的価値の計測と活用の現状に関する調査研究}総務省: "令和2年版 情報通信白書"\\\url{https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r02/html/nd132110.html}\\アクセス日: 2024/02/02.
+%   \bibitem{文書管理実態調査2023}Biz Clip: "デジタル化、進んでる？ 文書管理実態調査2023"\\\url{https://www.bizclip.ntt-west.co.jp/articles/bcl00014-039.html}\\アクセス日: 2024/02/02.
+%   \bibitem{電子フォーム}曽根直人，林秀彦，菊地章: "電子フォームを用いた申請書処理の効率化", 鳴門教育大学情報教育ジャーナル5, 29-34, 2008
+%   \bibitem{i-Reporter}i-reporter.jp: "【i-Reporter】シェアNo.1の現場帳票電子化システム - 多彩な機能の現場帳票システム"\\\url{https://i-reporter.jp/}\\アクセス日: 2024/01/28.
+%   \bibitem{Create!Form}Create!Form: "帳票ツールのCreate!Form | インフォテック株式会社""\\\url{https://www.createform.jp/}\\アクセス日: 2024/01/28.
+%   \bibitem{電子文書と電子化文書}株式会社マネーフォワード: "電子文書とは？電子化文書の比較とメリット、注意点を解説！"\\\url{https://biz.moneyforward.com/contract/basic/2035/}\\アクセス日: 2024/01/09.
+%   \bibitem{バリデーションチェック}ZDNET Japan: "バリデーション"\\url{https://japan.zdnet.com/glossary/exp/バリデーション/?s=4}
+%   \bibitem{OpenCV}OpenCV: "opencv"\\\url{https://github.com/opencv/opencv/blob/master/LICENSE}\\アクセス日: 2024/01/09.
+%   \bibitem{getStructuringElement関数}OpenCV.jp: "画像フィルタリング — opencv 2.2 documentation"\\\url{http://opencv.jp/opencv-2svn/cpp/image_filtering.html}\\アクセス日: 2024/01/15.
+%   \bibitem{ガウシアンフィルタ}鳥取大学 OpenCV-Pythonチュートリアル: "画像の平滑化"\\\url{http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_filtering/py_filtering.html}\\アクセス日: 2024/01/10.
+%   \bibitem{大津の二値化}大津展之: "認識問題としての二値化と各種方法の検討", 1980年電子情報通信学会論文誌 Vol.J63-D No.4, pp.349-356, 1980
+%   \bibitem{画素値}MathWorks: "8ビットと16ビットイメージ"\\\url{https://jp.mathworks.com/help/matlab/creating_plots/working-with-8-bit-and-16-bit-images.html}\\アクセス日: 2024/01/11.
+%   \bibitem{膨張処理}MathWorks: "モルフォロジー演算のタイプ"\\\url{https://jp.mathworks.com/help/images/morphological-dilation-and-erosion.html}\\アクセス日: 2024/01/10.
+%   \bibitem{エッジ検出}LearnOpenCV: "Edge Detection Using OpenCV"\\\url{https://learnopencv.com/edge-detection-using-opencv/}\\アクセス日: 2024/01/10.
+%   \bibitem{Canny法}鳥取大学 OpenCV-Pythonチュートリアル: "Canny法によるエッジ検出"\\\url{http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_canny/py_canny.html}\\アクセス日: 2024/01/10.
+%   \bibitem{輪郭検出}鳥取大学 OpenCV-Pythonチュートリアル: "輪郭: 初めの一歩"\\\url{http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_contours/py_contours_begin/py_contours_begin.html#contours-getting-started}\\アクセス日: 2024/01/28.
+%   \bibitem{ハフ変換}MathWorks: "ハフ変換"\\\url{https://jp.mathworks.com/discovery/image-transform.html}\\アクセス日: 2024/01/28.
+%   \bibitem{HoughLinesP関数の引数}OpenCV: "Feature Detection"\\\url{https://docs.opencv.org/3.4/dd/d1a/group__imgproc__feature.html#ga8618180a5948286384e3b7ca02f6feeb}\\アクセス日: 2024/01/28.
+%   \bibitem{輪郭描画}OpenCV: "OpenCV: Contours : Getting Started"\\\url{https://docs.opencv.org/3.4/d4/d73/tutorial_py_contours_begin.html}\\アクセス日: 2024/01/28.
+%   \bibitem{DeblurGANv2}Orest Kupyn and Tetiana Martyniuk and Junru Wu and Zhangyang Wang: "DeblurGAN-v2: Deblurring (Orders-of-Magnitude) Faster and Better", The IEEE International Conference on Computer Vision (ICCV), pp.8878-8887, 2019
+%   \bibitem{Tesseract-OCR}Tesseract-OCR: "tesseract"\\\url{https://github.com/tesseract-ocr/tesseract}\\アクセス日: 2024/01/29.
+%   \bibitem{DeblurGANv2の先行研究}Emilda Zhang,  Vincent Ardyan Putra, and Gede Putra Kusuma: "Improving optical character recognition accuracy for Indonesia identification card using generative adversarial network", Journal of Theoretical and Applied Information Technology Vol.100 No.8, pp.2424-2437, 2022
+%   \bibitem{光学文字認識}比留川翔哉, 丸山一貴: "本の厚みによる歪みを考慮した光学文字認識", 情報処理学会 第60回プログラミング・シンポジウム, pp.81-86, 2019
+%   \bibitem{光学文字認識ソフトウェア}Amazon Web Services: "OCR (光学文字認識) とは"\\\url{https://aws.amazon.com/jp/what-is/ocr/}\\アクセス日: 2024/01/29.
+%   \bibitem{Python}Python: "Python 3.7.10"\\\url{https://www.python.org/downloads/release/python-3710/}\\アクセス日: 2024/01/29.
+%   \bibitem{PyOCR}pyocr: "pyocr"\\\url{https://gitlab.gnome.org/World/OpenPaperwork/pyocr}\\アクセス日: 2024/01/29.
+%   \bibitem{Mecab}GitHub Pages: "MeCab: Yet Another Part-of-Speech and Morphological Analyzer"\\\url{https://taku910.github.io/mecab/}\\アクセス日: 2024/01/29.
+%   \bibitem{Fugashi}McCann, Paul: "fugashi, a Tool for Tokenizing Japanese in Python", Proceedings of Second Workshop for NLP Open Source Software (NLP-OSS), pp.44-51, 2020
+%   \bibitem{UniDic}言語資源開発センター: "「UniDic」国語研短単位自動解析用辞書"\\\url{https://clrd.ninjal.ac.jp/unidic/}\\アクセス日: 2024/01/29.
+%   \bibitem{UniDic品詞体系}言語資源開発センター: 伝康晴, 山田篤, 小椋秀樹, 小磯花絵, 小木曽智信: "UniDic version 1.3.9 ユーザーズマニュアル"\\\url{https://clrd.ninjal.ac.jp/unidic/UNIDIC_manual.pdf}\\アクセス日: 2024/01/09.
+%   \bibitem{Llama2}Meta AI: "Llama2 - Meta AI"\\\url{https://ai.meta.com/llama/}\\アクセス日: 2024/01/29.
+%   \bibitem{Youri}rinna: "rinna、Llama 2の日本語継続事前学習モデル「Youri 7B」を公開"\\\url{https://rinna.co.jp/news/2023/10/20231031.html}\\アクセス日: 2024/01/09.
+%   \bibitem{IoU閾値}井筒竜宇, 矢吹信喜, 福田知弘: "深層学習を用いた鋼骨組構造における出来形検出に関する基礎的検討", 土木学会論文集F3(土木情報学), Vol.75, No.2, pp.94-105, 2019
+%   \bibitem{Photolize}photolize.jp: "Photolize（フォトライズ）"\\\url{https://photolize.jp/}\\アクセス日: 2024/01/29.
+%   \bibitem{kintone}kintone（キントーン）: "kintone"\\\url{https://kintone.cybozu.co.jp/}\\アクセス日: 2024/02/02.
+%   \bibitem{PrintCreator}トヨクモ: "PrintCreator"\\\url{https://pc.kintoneapp.com/?gad_source=1&gclid=Cj0KCQiAwvKtBhDrARIsAJj-kTj_rrNpIWvq3s2vrW5tr-W9W0XDJ0ZkJM-nKnUcZjjxn130_vxpHbcaAlEnEALw_wcB}\\アクセス日: 2024/02/03.
+%   \bibitem{k-Report}k-report.work: "k-Report | kintoneに高機能帳票機能を"\\\url{https://k-report.work/}\\アクセス日: 2024/02/03.
+% \end{thebibliography}
 
 % \newpage
 % \listoftodos

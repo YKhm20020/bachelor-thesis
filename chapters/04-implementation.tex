@@ -1,5 +1,6 @@
-\chapter{本ツールの実装}\label{cha:Implementation}
-本ツールは、領域座標取得部、文字情報取得部、ラベル付与部、ファイル出力部の4つの処理部で構成する。
+\chapter{本提案手法の実装}\label{cha:Implementation}
+提案手法を試行するために、帳票画像内における記入欄の領域座標とその記入欄に入力する内容のデータ型をまとめたJSONファイルに加えて、検知した記入欄を強調表示した画像2枚を出力するツールを試作する。
+試作するツールは、領域座標取得部、文字情報取得部、ラベル付与部、ファイル出力部の4つの処理部で構成する。
 本ツールの構成を、図\ref{fig:structure}に示す。
 
 以降、本章では4つの処理部について説明する。
@@ -18,78 +19,54 @@
 矩形の帳票画像記入欄については、各頂点の4つのxy座標を、下線部の帳票画像記入欄については、両端点の2つのxy座標を領域座標として取得する。
 領域座標取得部の出力結果である領域座標は、ラベル付与部(\ref{subsec:label_link_processing}節で後述)で用いる。
 
+% 矩形
 \subsection{矩形領域座標取得用画像処理}\label{subsec:image_processing_for_rect_coords_obtainment}
 矩形領域座標取得用画像処理は、この後の処理である、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節で後述)を実行するための前処理として、画像処理を行う。
 本ツールでは、矩形の取得にあたり、OpenCVのfindContours関数(\ref{sec:OpenCV}節を参照)を用いる。
-この関数を呼び出すとき、第一引数に渡す処理画像のパスについて、渡したパスの処理画像は白または黒色でなければエラーが発生してしまうため、処理画像を二値化する必要がある。
-また、矩形の検出精度を高めるため、ノイズ除去(同節で後述)などの画像処理を組み合わせ、二値化する。
+この関数を呼び出すとき、第一引数に渡すパスが示す処理画像の全ての画素が白色または黒色でなければエラーが発生してしまうため、処理画像を二値化する必要がある。
+また、矩形の検出精度を高めるため、後述する画像処理を組み合わせ、二値化する。
 
 以下に、本処理で施す画像処理を順に示す。
 
 \begin{enumerate}
-    \item OpenCVのcvtColor関数を用いた、帳票画像のグレースケール化
+    \item OpenCVのcvtColor関数を用いた帳票画像のグレースケール化\\
         グレースケール化によって、色情報を削減し、計算量を減らすことで処理を高速化する。
-    \item DeblurGANv2(\ref{sec:DeblurGANv2}節を参照)の適用によるブレ除去後のグレースケール化帳票画像の生成\\
-        DeblurGANv2を適用することにより、帳票画像を撮影する際に発生する画像内のブレを除去し、矩形の検出精度を高める。
-    \item OpenCVのGaussianBlur関数(\ref{sec:OpenCV}節を参照)を用いたガウシアンフィルタによるノイズ除去\\
-        画像内のノイズを除去し、ノイズを矩形として検出することを防ぐ。
+    \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
+        DeblurGANv2(\ref{sec:DeblurGANv2}節を参照)を適用することにより、帳票画像を撮影する際に発生する画像内のブレを除去し、矩形の検出精度を高める。
+    \item OpenCVのGaussianBlur関数を用いたガウシアンフィルタによるノイズ除去\\
+        GaussianBlur関数(\ref{sec:OpenCV}節を参照)を用いて、画像内のノイズを除去し、ノイズを矩形として検出することを防ぐ。
         なお、3行3列の矩形カーネルを使用し、標準偏差を0とする。
     \item OpenCVのthreshold関数(\ref{sec:OpenCV}節を参照)を用いた大津の二値化による二値画像への変換\\
-        大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_TOZERO\_INVに指定し、二値化する(\ref{sec:OpenCV}節を参照)。
+        threshold関数(\ref{sec:OpenCV}節を参照)を用いて、大津の二値化による閾値処理を行う。
+        閾値の決定手法を指定する変数は、THRESH\_TOZERO\_INVに指定して二値化する。
         白黒を反転して二値化することにより、複数の矩形が隣接する場合に、それらを囲む矩形を不要に検出してしまうことを防ぐ。
-    \item OpenCVのgetStructuringElement関数(\ref{sec:OpenCV}節を参照)を用いたカーネルの作成\\
-        5行5列の矩形カーネルを作成する。
-    \item OpenCVのdilate関数(\ref{sec:OpenCV}節を参照)を用いた膨張処理\\
+    \item OpenCVのgetStructuringElement関数を用いたカーネルの作成\\
+        getStructuringElement関数(\ref{sec:OpenCV}節を参照)を用いて、5行5列の矩形カーネルを作成する。
+    \item OpenCVのdilate関数を用いた膨張処理\\
         getStructuringElement関数で作成した矩形カーネルを用いる。
-        膨張処理で矩形の辺を太くすることで、検出精度を高める。
+        dilate関数(\ref{sec:OpenCV}節を参照)を用いて、膨張処理で矩形の辺を太くすることで、検出精度を高める。
         なお、膨張する回数は1回とする。
 \end{enumerate}
 
 
 \subsection{矩形領域座標取得処理}\label{subsec:rect_coords_obtainment_processing}
 矩形領域座標取得処理は、矩形の帳票画像記入欄を検出し、矩形領域座標を取得、および、出力する処理である。
-本処理の出力は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)の一部で利用する。
+本処理の出力は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)で利用する。
 
 \ref{subsec:image_processing_for_rect_coords_obtainment}節で述べた画像処理後、OpenCVのfindContours関数(\ref{sec:OpenCV}節を参照)による輪郭検出を用いて矩形の帳票画像記入欄を検出する。
-なお、以下の条件のいずれかに該当する矩形については、誤検知の可能性が高いとして、出力の対象外とする。
+なお、以下の条件のいずれかに該当する矩形については、除去できなかったノイズを矩形として誤検知した可能性が高いとして、出力の対象外とする。
 
 \begin{itemize}
     \item 面積が3000ピクセル以下である場合
     \item 一辺の長さが10ピクセル以下である場合
 \end{itemize}
 
-
-
-% スマートフォンのカメラで撮影する際にブレが生じた帳票画像を図\ref{fig:before_deblur}に示す。
-% 図\ref{fig:before_deblur}に対して、DeblurGANv2を適用することによってブレを除去した画像を図\ref{fig:after_deblur}に示す。
-% 図\ref{fig:before_deblur}と図\ref{fig:after_deblur}より、DeblurGANv2によるブレ除去によって、図\ref{fig:before_deblur}でブレている矩形の線が図\ref{fig:after_deblur}ではっきりとなっていることがわかる。
-
-% \begin{figure}[t]
-%     \centering
-%     \begin{minipage}[t]{0.45\linewidth}
-%       \centering
-%       \fbox{
-%         \includegraphics[keepaspectratio, width=7cm]{image/04-implementation/before_deblur.png}
-%       }
-%       \caption{撮影するにあたってブレが生じた帳票画像}
-%       \label{fig:before_deblur}
-%     \end{minipage}
-%     \begin{minipage}[t]{0.45\linewidth}
-%       \centering
-%       \fbox{
-%         \includegraphics[keepaspectratio, width=7cm]{image/04-implementation/after_deblur.jpeg}
-%       }
-%       \caption{発生したブレを除去した帳票画像}
-%       \label{fig:after_deblur}
-%     \end{minipage}
-% \end{figure}
-
-
+% 下線部
 \subsection{下線部領域座標取得用画像処理}\label{subsec:image_processing_for_underline_coords_obtainment}
 下線部領域座標取得用画像処理は、この後の処理である下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)を実行するための前処理として、画像処理を行う。
 本ツールでは、下線部の取得にあたり、OpenCVのHoughLinesP関数(\ref{sec:OpenCV}節を参照)による、ハフ変換を用いた直線検出を行う。
-この関数の第一引数に渡す処理画像のパスについて、渡すパスの処理画像は白または黒色でなければエラーが発生してしまうため、処理画像を二値化する必要がある。
-また、直線の検出精度を高めるため、ノイズ除去などの画像処理を組み合わせ、二値化する。
+この関数を呼び出すとき、第一引数に渡すパスが示す処理画像の全ての画素が白色または黒色でなければエラーが発生してしまうため、処理画像を二値化する必要がある。
+また、直線の検出精度を高めるため、後述する画像処理を組み合わせ、二値化する。
 
 以下に、本処理で施す画像処理を順に示す。
 なお、本処理における画像処理の一部は、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節を参照)と同様の画像処理を施す。
@@ -100,14 +77,14 @@
     \item DeblurGANv2の適用によるブレ除去後のグレースケール化帳票画像の生成\\
         \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理。
     \item OpenCVのthreshold関数を用いた大津の二値化による二値画像への変換\\
-        大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_BINARY\_INVに指定し、二値化する。
-        ハフ変換は白線を検出する処理であるため、白黒を反転して二値化することにより、黒色の直線を白色とし、検出精度を高める。
+        大津の二値化による閾値処理を行い、閾値の決定手法を指定する変数をTHRESH\_BINARYに指定し、二値化する。
     \item OpenCVのCanny関数(\ref{sec:OpenCV}節を参照)を用いたCanny法によるエッジ検出\\
+        Canny関数(\ref{sec:OpenCV}節を参照)を用いて、エッジ検出を行う。
         閾値処理における上限と下限の閾値を、以下のように決定する。
         \begin{enumerate}
             \item 大津の二値化で取得した閾値を受け取る。
             \item 二値画像を対象に、画素値の中央値を定数倍(本研究では定数を0.33とする)し、取得した閾値から加減算する。
-            \item 加算した値を上限の閾値、減算した値を下限の閾値として設定する。
+            \item 加算した値を上限の閾値、減算した値を下限の閾値として、それぞれ設定する。
         \end{enumerate}
 \end{enumerate}
 
@@ -143,12 +120,13 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 \begin{enumerate}
     \item DeblurGANv2の適用によるブレ除去後の帳票画像の生成\\
         \ref{subsec:rect_coords_obtainment_processing}節で述べた処理と同様の処理。
-    \item 領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)から、領域座標を取得する。
+    \item 領域座標の取得\\
+        領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)から、領域座標を取得する。
     \item 背景色のRGBの値を取得\\
         背景色は、画像内で占める面積が最も広い色であるとする。
         全画素のRGB値を取得し、最も取得回数が多いRGB値を、背景色のRGB値とする。
-    \item OpenCVのdrawContours関数(\ref{sec:OpenCV}節を参照)と、OpenCVのline関数(\ref{sec:OpenCV}節を参照)を用いた、背景色での矩形領域と下線部領域の描画\\
-        矩形領域は矩形を、下線部領域は直線を、背景色で描画することによって、文字でない黒色の画素を減らす。
+    \item OpenCVのdrawContours関数と、OpenCVのline関数を用いた、背景色での矩形領域と下線部領域の描画\\
+        矩形領域はdrawContours関数(\ref{sec:OpenCV}節を参照)を用いて矩形を、下線部領域はOpenCVのline関数(\ref{sec:OpenCV}節を参照)を用いて直線を、背景色でそれぞれ描画することによって、文字でない黒色の画素を減らす。
         これにより、文字でない黒色の画素値によって、大津の二値化で計算する閾値が変化することを防ぐ。
         本ツールでは、太さ15ピクセルの矩形と直線を描画する。
     \item OpenCVのimwrite関数を用いた、画像の保存\\
@@ -224,12 +202,14 @@ y座標が同じ場合は、さらにx座標を参照し、昇順にソートす
 \end{center}
 
 \begin{center}
-    A: ソート後の番号\\
+    \begin{tabular}{l}
+    A: ソート後の番号\\  
     B: バウンディングボックスの左上頂点のx座標\\
-    C: バウンディングボックスの左上頂点のy座標\\
+    C: バウンディングボックスの左上頂点のy座標\\  
     D: バウンディングボックスの右下頂点のx座標\\
     E: バウンディングボックスの右下頂点のy座標\\
     F: 取得文字\\
+    \end{tabular}
 \end{center}
 
 例えば、番号1の取得文字は、「請求日」であり、バウンディングボックスの左上頂点のxy座標が、(1597, 321)であり、バウンディングボックスの右下頂点のxy座標が、(1724, 363)となる。
@@ -282,7 +262,8 @@ y座標が同じ場合は、さらにx座標を参照し、昇順にソートす
 文字を認識する際に、紙面と背景の境界や、領域取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得できなかった矩形や直線を、文字として誤認識する場合がある。
 不要な文字の属性推測処理を防ぐことにより、処理時間を短縮することができる。
 
-以下に、UniDic品詞体系(左からカンマ区切りで、大分類、中分類、小分類、細分類)をもとに、除外対象である形態素の品詞を示す。
+以下に、UniDic品詞体系(左からカンマ区切りで、大分類、中分類、小分類、細分類)に基づき、除外対象である形態素の品詞を示す。
+分類が"*"となっている場合は、該当する分類がないことを示す。
 なお、除外対象とする品詞は、経験から決定している。
 
 \begin{itemize}
@@ -326,16 +307,16 @@ y座標が同じ場合は、さらにx座標を参照し、昇順にソートす
 \end{figure}
 
 \section{ラベル付与部}\label{sec:label_link_part}
-ラベル付与部では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節を参照)後の取得文字の属性を、属性の候補(\ref{subsec:att_prediction}節を参照)である、日付(date)、文字列(string)、数値(number)の3つから適切な1つを推測し、取得した領域にラベルとして付与する。
+ラベル付与部では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節を参照)後の取得文字の属性を、属性(\ref{subsec:att_prediction}節を参照)である、日付(date)、文字列(string)、数値(number)の3つから適切な1つを推測し、取得した領域にラベルとして付与する。
 付与するラベルの種類は、領域近傍の取得文字から推測する属性に依存する。
 領域座標と、領域座標に対応するラベルを組としたJSONファイルを出力とする。
 
 \subsection{属性推測処理}\label{subsec:att_prediction_processing}
-属性推測処理では、取得文字に対して、属性の候補である、日付(date)、文字列(string)、数値(number)の中から推測する。
+属性推測処理では、取得文字に対して、属性である、日付(date)、文字列(string)、数値(number)の中から推測する。
 なお、属性が推測不可である取得文字の属性は、文字列とする。
 属性の推測には、大規模言語モデルYouri(\ref{sec:Youri}節を参照)を用いる。
 YouriはLlama2を日本語の学習データで継続事前学習を行った大規模言語モデルである。
-大規模言語モデルは、指示と異なる出力をする場合がある。
+ただし、大規模言語モデルは、指示と異なる出力をする場合がある。
 候補ではない属性の推測を防ぐため、Youriの出力から3つの属性のいずれかとなるよう補正を行う。
 日本語の推論に特化した言語モデルを利用することによって、取得した日本語の文字に対して、属性をより正確に推測することができる。
 
@@ -366,15 +347,15 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 
 図\ref{fig:char_recognition_for_original}に示した取得文字に対して、Youriが出力したテキストの一部を、以下の図\ref{fig:output_Youri}に示す。
 図\ref{fig:output_Youri}は、左にYouriの出力を、右の括弧内に属性を推測した取得文字を示す。
-図\ref{fig:output_Youri}の1行目や4行目は、「番号」、「月」という取得文字に対して、属性の候補ではなく、文を出力している。
+図\ref{fig:output_Youri}の1行目や3行目は、「番号」、「詩」という取得文字に対して、文を出力している。
 
 \lstset{language=}
 \begin{figure}[t]
     \begin{lstlisting}
         数値に該当する。 (番号)
         日付 (請求日)
-        文字列 (詩)
-        文字列が適切です。 (月)
+        詩は、文字列に該当する。 (詩)
+        日付 (月)
         日付 (求)
         数値 (較)
         日付 (御中)
@@ -403,9 +384,11 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
 \end{center}
 
 \begin{center}
-    A: ソート後の番号\\
-    B: 属性を推測した結果\\
-    C: 推測対象である取得文字\\
+    \begin{tabular}{l}
+        A: ソート後のインデックス\\
+        B: 属性を推測した結果\\
+        C: 推測対象である取得文字\\
+    \end{tabular}
 \end{center}
 
 例えば、番号1の取得文字は、「請求日」であり、推測した属性は日付(date)となる。番号4の取得文字は、「月」であり、推測した属性は文字列(string)となる。
@@ -452,16 +435,17 @@ YouriはLlama2を日本語の学習データで継続事前学習を行った大
     \item \label{enum:bbox_center} 文字位置であるバウンディングボックスの中心点のxy座標を計算する。
     \item 取得した領域座標のうち、矩形領域は右下頂点のxy座標、下線部領域は右端点のxy座標と、計算した中心点のxy座標を比較し、\ref{enum:bbox_center}で計算した中心点のx座標とy座標が共に大きい全ての領域座標をラベル割付の対象として、文字位置に対応する取得文字の属性をラベルとして割り付ける。
     \item 繰り返し処理によって、既にラベルを割り付けた領域座標がラベル割付の対象となった場合は、後の処理で割り付けるラベルに更新する。
+          これによって、日本語の帳票を書き進める順番に対応して、別の領域座標のラベルを割り付けることを防ぐ。
 \end{enumerate}
 
 以上の繰り返し処理を行った後、領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得した領域座標に対して、ラベルを割り付ける。
 
 \section{ファイル出力部}\label{subsec:file_output_part}
-ファイル出力部では、領域座標と、対応するラベルを組とするJSON形式のファイルと、JSONファイルの取得領域を強調表示したPNG形式の画像2枚を出力する。
+ファイル出力部では、領域座標と、領域座標に対応するラベルを組とするJSON形式のファイル、および、JSONファイルの取得領域を強調表示したPNG形式の画像2枚を出力する。
 JSONファイルと、PNG画像のエクスポートにあたって、領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得した領域座標と、ラベル割付処理(\ref{subsec:label_link_processing}節を参照)で取得したラベルを参照する。
 
 \subsection{JSONファイル出力処理}\label{subsec:json_file_output_processing}
-JSONファイル出力処理では、取得した領域座標とラベルを整形し、領域座標と、対応するラベルを組とするJSONファイルを出力する処理である。
+JSONファイル出力処理では、取得した領域座標とラベルを整形し、領域座標と、領域座標に対応するラベルを組とするJSONファイルを出力する処理である。
 出力するJSONファイルは、配列rects\_dataと、配列underlines\_dataで構成し、矩形領域の情報、下線部領域の情報をそれぞれ持つ。
 これら2つの配列は、それぞれ以下の情報をもつ。
 
@@ -478,9 +462,9 @@ JSONファイル出力処理では、取得した領域座標とラベルを整�
 出力する画像については、矩形領域強調画像と、下線部領域強調画像の計2枚の画像を出力する。
 
 矩形領域強調画像については、矩形をランダムなRGBカラーで描画することで、矩形領域を強調表示する。
-さらに、左上頂点に、JSONファイル内のrect\_data配列のidキーに対応する値と、labelキーに対応する値を表示する。
+さらに、左上頂点に、JSONファイル内のrects\_data配列のidキーの値と、labelキーの値を表示する。
 下線部の帳票画像記入欄については、緑色で下線部領域の直線を描画することによって、下線部領域を強調表示する。
-さらに、左端点の上に、JSONファイル内のunderlines\_data配列のidキーに対応する値と、labelキーに対応する値を表示する。
+さらに、左端点の上に、JSONファイル内のunderlines\_data配列のidキーの値と、labelキーの値を表示する。
 これにより、人間が目視でJSONファイルを確認する場合と比較して、取得した領域座標と割り付けたラベルの確認が容易となる。
 
 以下に、矩形と直線を、割り付けたラベルと共に描画した画像を出力する流れを示す。
@@ -490,7 +474,7 @@ JSONファイル出力処理では、取得した領域座標とラベルを整�
     \item Pythonのcopy関数により、入力である帳票画像をコピーし、2枚の帳票画像A、Bを生成する。
     \item 帳票画像Aに対して、OpenCVのdrawContours関数を用いて、矩形領域座標を参照して矩形を描画する。
     \item 帳票画像Bに対して、OpenCVのline関数を用いて、下線部領域座標を参照して直線を描画する。
-    \item OpenCVのputText関数(\ref{sec:OpenCV}節を参照)を用いて、idキーに対応する値と、labelキーに対応する値を、各領域座標の左上に描画する。
+    \item OpenCVのputText関数(\ref{sec:OpenCV}節を参照)を用いて、idキーの値と、labelキーの値を、各領域座標の左上に描画する。
     \item OpenCVのimwrite関数を用いて、帳票画像Aと帳票画像Bを、それぞれ矩形領域強調画像と下線部領域強調画像として保存する。
 \end{enumerate}
 

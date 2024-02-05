@@ -4,8 +4,8 @@
 
 \section{入力対象の画像}\label{sec:input_images}
 本ツールの入力対象である画像については、以下の条件を全て満たす画像とする。
-なお、帳票は帳簿と伝票の総称であり、電子文書は、Wordやテキストファイルなど、デジタル情報として作成した文書を指し、電子化文書は紙媒体の書類をスキャンしたPDFファイルや画像の形式で保存した文書を指す\cite{電子文書と電子化文書}。
-電子化文書については、本ツールにおいては、スマートフォンのカメラで撮影した帳票画像を想定する。
+なお、帳票は帳簿と伝票の総称であり、電子文書はWordやテキストファイルなど、デジタル情報として作成した文書を指し、電子化文書は紙媒体の書類をスキャンしたPDFファイルや画像の形式で保存した文書を指す\cite{電子文書と電子化文書}。
+本ツールにおいて、電子化文書はスマートフォンのカメラで撮影した帳票画像を想定する。
 
 \begin{itemize}
 	\item 帳票の電子文書または電子化文書の画像である。
@@ -34,7 +34,7 @@ imwrite関数は、多次元配列を画像ファイルに変換し、保存す�
 \paragraph{cvtColor関数}
 cvtColor関数は、画像の色空間を変換する関数である。
 本研究では、読み込んだ画像をグレースケール化するために用いる。
-これは、カラー画像をグレースケール化することにより、画像処理に必要な計算量を減らす目的がある。
+この処理は、カラー画像をグレースケール化することにより、画像処理に必要な計算量を減らすために行う。
 
 \paragraph{getStructuringElement関数}
 getStructuringElement関数は、カーネルを作成する関数である\cite{getStructuringElement関数}。
@@ -65,11 +65,8 @@ threshold関数は、画像を二値化する関数である。
 
 \begin{itemize}
 	\item THRESH\_BINARY\\
-		文字情報取得用画像処理(\ref{subsec:image_processing_for_char_recognition}節で後述)で設定する。
+		下線部領域座標取得用画像処理(\ref{subsec:image_processing_for_underline_coords_obtainment}節で後述)と、文字情報取得用画像処理(\ref{subsec:image_processing_for_char_recognition}節で後述)で設定する。
 		大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を第三引数で設定する値に変換し、閾値よりも大きい場合は画素数を0に変換して二値化する。
-	\item THRESH\_BINARY\_INV\\
-		下線部領域座標取得用画像処理(\ref{subsec:image_processing_for_underline_coords_obtainment}節で後述)で設定する。
-		大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を0に、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
 	\item THRESH\_TOZERO\_INV\\
 		矩形領域座標取得用画像処理(\ref{subsec:image_processing_for_rect_coords_obtainment}節で後述)で設定する。
 		大津の二値化を用いる場合は、大津の二値化によって決定した閾値を基準に、ある注目画素の画素値が閾値よりも小さい場合は画素値を変換せず、閾値よりも大きい場合は画素値を第三引数で設定する値に変換して二値化する。
@@ -81,7 +78,7 @@ dilate関数は、画像に膨張処理を施す関数である。
 第一引数として、二値化処理後の画像である、二値画像を指定する。
 また、第二引数では、カーネルを指定する。
 さらに、第三引数では、膨張処理を適用する回数を指定する。
-本研究では、矩形領域座標取得用画像処理(\ref{subsec:image_processing_for_rect_coords_obtainment}節で後述)で施す画像処理のひとつとして用いる。
+本研究では、矩形領域座標取得用画像処理(\ref{subsec:image_processing_for_rect_coords_obtainment}節で後述)で施す画像処理の一部として用いる。
 
 \paragraph{Canny関数}
 Canny関数は、Canny法によってエッジ検出を行う関数である。
@@ -114,7 +111,7 @@ HoughLinesP関数は、ハフ変換によって画像内にある直線を検出
 座標$(x, y)$を通る直線は無数に存在するため、式\ref{eq:hough}を満たす$(\rho, \theta)$も無数に存在する。
 縦軸を$\rho$、横軸を$\theta$として、それらの$(\rho, \theta)$を、$\rho$-$\theta$空間に射影すると、曲線を図示できる。
 この座標系の変換を、直線上の他にある$(x, y)$以外の座標に対して行ったとき、$\rho$-$\theta$空間に交点が存在する。
-この操作を全画素に対して行い、$\rho$-$\theta$空間で多くの線が重なっている点$(\rho, \theta)$から、直線が存在する可能性が高い$(\rho, \theta)$を探し、直線を検出する。
+この操作を全画素に対して行い、$\rho$-$\theta$空間で多くの線が重なっている点$(\rho, \theta)$の中から、直線が存在する可能性が高い点$(\rho, \theta)$を探し、直線を検出する。
 HoughLinesP関数を用いる際は、以下の順で引数を渡す\cite{HoughLinesP関数の引数}。
 \begin{enumerate}
 	\item 直線を検出する二値画像のパス
@@ -143,27 +140,36 @@ putText関数は、文字を画像に描画する関数である。
 本研究では、領域強調画像出力処理(\ref{subsec:area_highlighted_image_output_processing}節で後述)で領域とラベルを描画するために用いる。
 
 \section{DeblurGANv2}\label{sec:DeblurGANv2}
-DeblurGANv2は、敵対的生成ネットワーク(GAN)をブレ除去に適用したツールである\cite{DeblurGANv2}。
+DeblurGANv2は、敵対的生成ネットワーク(Generative Adversarial Network)をブレ除去に適用したツールである\cite{DeblurGANv2}。
 スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
 また、先行研究において、スマートフォンのカメラで撮影した画像に対して、複数の画像処理と共にDeblurGANv2を適用することによって、ブレ除去によって画像品質が向上し、Tesseract-OCR\cite{Tesseract-OCR}を用いた光学文字認識(\ref{sec:Optical-Charactor-Recognition}節で後述)の精度が向上することが示されている\cite{DeblurGANv2の先行研究}。
-本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節で後述)と文字情報取得部(\ref{sec:OCR_part}節で後述)で施す画像処理の1つに用いる。
+本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節で後述)と文字情報取得部(\ref{sec:OCR_part}節で後述)で施す画像処理の一部に用いる。
 
 
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
-光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字を識別子、文字コードに変換することである\cite{光学文字認識}。
+光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字を識別し、文字コードに変換する処理である\cite{光学文字認識}。
 本研究では、文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節で後述)で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
 また、本研究では、光学文字認識ソフトウェア\cite{光学文字認識ソフトウェア}の1つであるTesseract-OCRを、Python\cite{Python}のOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から用いる。
-PyOCRを用いることにより、文字を認識する処理にbuilderという変数をパラメータとして指定できる。
-本研究では、LineBoxBuilderを変数builderに指定し、行単位で文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する。
+PyOCRを用いる際に、文字を認識する処理にbuilderという変数をパラメータとして指定できる。
+本研究では、LineBoxBuilderを変数builderに指定することで、行単位で文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する。
 
 \section{Fugashi}\label{sec:Fugashi}
 Fugashiは、形態素解析ソフトウェアであるMecab\cite{Mecab}をPythonで使用する際のラッパーライブラリである\cite{Fugashi}。
 本研究では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節で後述)で属性判定に不要な取得文字を、取得文字を構成する形態素の品詞を参照することによって、出力の対象外とするために用いる。
 また、本研究でFugashiの解析に用いる辞書として、UniDic\cite{UniDic}を利用する。
-よって、本論文で記述する品詞体系についてはUniDic品詞体系とする。
+よって、本論文で記述する品詞体系は、UniDic品詞体系とする。
 UniDic品詞体系では、左からカンマ区切りで、大分類、中分類、小分類、細分類の順で品詞を列挙する\cite{UniDic品詞体系}。
 
-
 \section{Youri}\label{sec:Youri}
-Youriは、Llama2\cite{Llama2}を日本語の学習データで継続事前学習を行うことによって、日本語のテキスト生成能力を高めた大規模言語モデルである\cite{Youri}。
+Youriは、Llama2\cite{Llama2}に対し、日本語の学習データで継続事前学習を行うことによって、日本語のテキスト生成能力を高めた大規模言語モデルである\cite{Youri}。
 本研究では、属性推測処理(\ref{subsec:att_prediction_processing}節で後述)で取得文字の属性を判定するために用いる。
+
+\section{IoU}\label{sec:IoU}
+IoUは、物体検出において、2つの領域の重なり度合いを表す指標であり、1.0で完全一致、0.0で重なりがないことを示す。
+
+IoUを算出する式を、以下に示す。
+なお、一般に、IoUは0.5を閾値として、閾値以上である場合は一致とみなされる\cite{IoU閾値}。
+
+\begin{equation}
+    \rm{IoU} = \frac{2つの領域の積集合}{2つの領域の和集合}
+\end{equation}
