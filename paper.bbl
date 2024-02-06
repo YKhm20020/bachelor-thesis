@@ -18,21 +18,12 @@ Biz Clip.
 \newblock 電子フォームを用いた申請書処理の効率化.
 \newblock {\em 鳴門教育大学情報教育ジャーナル}, 5:29--34, 2008.
 
-\bibitem{i-Reporter}
-【i-reporter】シェアno.1の現場帳票電子化システム -
-  多彩な機能の現場帳票システム.
-\newblock アクセス日: 2024/01/28.
-
-\bibitem{Create!Form}
-帳票ツールのcreate!form | インフォテック株式会社.
-\newblock アクセス日: 2024/01/28.
-
-\bibitem{バリデーションチェック}
-バリデーション.
-
 \bibitem{電子文書と電子化文書}
 電子文書とは？電子化文書の比較とメリット、注意点を解説！
 \newblock アクセス日: 2024/01/09.
+
+\bibitem{バリデーションチェック}
+バリデーション.
 
 \bibitem{OpenCV}
 opencv.
@@ -154,6 +145,15 @@ rinna、llama 2の日本語継続事前学習モデル「youri 7b」を公開.
 \bibitem{Photolize}
 Photolize（フォトライズ）.
 \newblock アクセス日: 2024/01/29.
+
+\bibitem{i-Reporter}
+【i-reporter】シェアno.1の現場帳票電子化システム -
+  多彩な機能の現場帳票システム.
+\newblock アクセス日: 2024/01/28.
+
+\bibitem{Create!Form}
+帳票ツールのcreate!form | インフォテック株式会社.
+\newblock アクセス日: 2024/01/28.
 
 \bibitem{kintone}
 kintone.

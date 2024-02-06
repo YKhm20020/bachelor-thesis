@@ -1,15 +1,9 @@
-\chapter{本提案手法の機能}\label{cha:Function}
-本研究では、帳票画像内における記入欄の領域座標、および、その記入欄に入力する内容のデータ型をまとめたJSONファイルに加えて、検知した記入欄を強調表示した画像2枚を出力する、記入欄の検出およびラベル付与手法を提案する。
-まず、帳票画像内にある記入欄の位置を取得するために、記入欄を画像処理によって検出する。
-次に、検出した記入欄に入力する内容のデータ型を決定するために、入力内容を示す文字を認識し、大規模言語モデルを用いて、記入する内容が、日付(date)、文字列(string)、数値(number)の3種類のうちいずれかを、ラベルとして割り付ける。
-そして、取得した記入欄の領域座標を参照して、帳票画像に色を付けて描画することで、取得した記入欄を強調表示した画像を出力する。
-提案手法を実現するための手段として、これらの処理を行うツールを実装する。
-
-本章では、試作したツールの機能について説明する。
-試作したツールは、\ref{sec:input_images}節で述べた帳票画像を入力とする。
+\chapter{試作するツールの機能}\label{cha:Function}
+本章では、試作するツールの機能について説明する。
+試作するツールは、\ref{sec:input_images}節で述べた帳票画像を入力とする。
 出力は、領域の座標と、対応するラベルを組とするJSON(JavaScript Object Notation)形式のファイルと、領域の座標を帳票画像に描画したPNG(Portable Network Graphics)形式の画像である。
 出力する画像は、矩形の領域を描画した画像と、下線部の領域を描画した画像の2枚に分けている。
-これは、領域の誤検出によって、描画した矩形と直線が重なった場合、視認性が低下することを防ぐためである。
+これは、領域の誤検出によって、描画した矩形と直線が重なった場合に、視認性が低下することを防ぐためである。
 なお、本研究で用いる用語を、表\ref{tb:term}に示す。
 
 \begin{table}[t]
@@ -22,41 +16,36 @@
         \hline \hline
 		帳票画像記入欄 & 入力である帳票画像内の記入欄 \\
         \hline
-		電子フォーム記入欄 & 試作したツールによって取得した座標で示す記入欄 \\
+		電子フォーム記入欄 & 試作するツールによって取得した座標で示す記入欄 \\
         \hline
 		矩形領域 & 電子フォーム記入欄のうち、矩形で示された記入欄 \\
         \hline
 		下線部領域 & 電子フォーム記入欄のうち、下線で示された記入欄 \\
         \hline
-        領域座標 &
-        \begin{tabular}{l}
-            試作したツールによって取得する領域の座標\\矩形領域であれば、各頂点4つののxy座標にあたる\\下線部領域であれば、両端点の2つのxy座標にあたる
-        \end{tabular}\\
+        \multirow{3}{*}{領域座標} & 試作するツールによって取得する領域の座標 \\
+                                    & 矩形領域であれば、各頂点4つのxy座標にあたる \\
+                                    & 下線部領域であれば、両端点の2つのxy座標にあたる \\
         \hline
-        文字情報 &  
-        \begin{tabular}{l}
-            文字認識によって認識した文字と\\それを囲むバウンディングボックスの各頂点のxy座標
-        \end{tabular}\\
+        \multirow{2}{*}{文字情報} & 文字認識によって認識した文字と \\
+                                    & それを囲むバウンディングボックスの各頂点のxy座標 \\
         \hline
         属性 & 文字認識によって得た文字から推測するデータ型 \\
         \hline
-        ラベル & 
-        \begin{tabular}{l}
-            文字の近傍に存在する電子フォーム記入欄に対して\\文字位置と属性から推測するデータ型
-        \end{tabular}\\
+        \multirow{2}{*}{ラベル} & 文字の近傍に存在する電子フォーム記入欄に対して\\
+                                    & 文字位置と属性から推測するデータ型 \\
         \hline
 	\end{tabular}
 \end{table}
 
-また、本研究で作成するツールは、以下の2つの機能を持つ。
+本研究で試作するツールは、以下の2つの機能を持つ。
 
 \begin{itemize}
     \item 領域座標取得およびラベル付与機能
     \item 領域強調画像出力機能
 \end{itemize}
 
-試作したツールの入力対象である帳票画像の例を、図\ref{fig:original}に示す。
-また、図\ref{fig:original}に対して、試作したツールを適用し、出力したJSONファイルの一部を、図\ref{fig:example_output_json}に示す。
+試作するツールの入力対象である帳票画像の例を、図\ref{fig:original}に示す。
+また、図\ref{fig:original}に対して、試作するツールを適用し、出力したJSONファイルの一部を、図\ref{fig:example_output_json}に示す。
 
 \begin{figure}[tp]
     \begin{center}
@@ -68,7 +57,7 @@
     \end{center}
 \end{figure}
 
-なお、出力する出力するJSONファイルは、矩形領域のラベルと領域の座標をまとめたrects\_data配列と、下線部領域のラベルと領域座標をまとめたunderlines\_data配列で構成する。
+なお、出力するJSONファイルは、矩形領域のラベルと領域の座標をまとめたrects\_data配列と、下線部領域のラベルと領域座標をまとめたunderlines\_data配列で構成する。
 rects\_data配列は、以下のキーとオブジェクトから構成する。
 
 \begin{itemize}
@@ -76,10 +65,10 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \item 領域座標に割り付けたラベルを示すlabelキー
     \item 矩形の領域座標をまとめたcoordsオブジェクト
     \begin{itemize}
-        \item 左上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_leftオブジェクト。
-        \item 左下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_leftオブジェクト。
-        \item 右下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_rightオブジェクト。
-        \item 右上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_rightオブジェクト。
+        \item 左上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_leftオブジェクト
+        \item 左下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_leftオブジェクト
+        \item 右下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_rightオブジェクト
+        \item 右上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_rightオブジェクト
     \end{itemize}
 \end{itemize}
 
@@ -89,52 +78,56 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \item 領域座標に割り付けたラベルを示すlabelキー
     \item 下線部の領域座標をまとめたcoordsオブジェクト
     \begin{itemize}
-        \item 左端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するleftオブジェクト。
-        \item 右端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するrightオブジェクト。
+        \item 左端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するleftオブジェクト
+        \item 右端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するrightオブジェクト
     \end{itemize}
 \end{itemize}
 
 \lstset{language=}
 \begin{figure}[t]
     \begin{lstlisting}
-{
-    "rects_data": [
-        "id": 0, 
-        "label": "number",
-        "coords": {
-            "top_left": {
-                "x": 1339,
-                "y": 1288
-            },
-            "buttom_left": {
-                "x": 1339,
-                "y": 1377
-            },
-            "buttom_right": {
-                "x": 1782,
-                "y": 1377
-            },
-            "top_right": {
-                "x": 1782,
-                "y": 1288
+    {
+        "rects_data": [
+            {
+                "id": 0, 
+                "label": "number",
+                "coords": {
+                    "top_left": {
+                        "x": 1339,
+                        "y": 1288
+                        },
+                    "buttom_left": {
+                        "x": 1339,
+                        "y": 1377
+                        },
+                    "buttom_right": {
+                        "x": 1782,
+                        "y": 1377
+                        },
+                    "top_right": {
+                        "x": 1782,
+                        "y": 1288
+                    }
+                }
             }
-        }
-    ],
-    "underlines_data": [
-        "id": 0,
-        "label": "string",
-        "coords": {
-            "left": {
-                "x": 213,
-                "y": 742
-                },
-            "right": {
-                "x": 1111,
-                "y": 742
+        ],
+        "underlines_data": [
+            {
+                "id": 0,
+                "label": "string",
+                "coords": {
+                    "left": {
+                        "x": 213,
+                        "y": 742
+                        },
+                    "right": {
+                        "x": 1111,
+                        "y": 742
+                    }
+                }
             }
-        }
-    ]
-}
+        ]
+    }
     \end{lstlisting}
     \caption{出力するJSONファイルの一部}\label{fig:example_output_json}
 \end{figure}
@@ -154,7 +147,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 \end{enumerate}
 
 \subsection{矩形領域取得}\label{subsec:rect_coords_obtainment}
-矩形領域取得では、矩形を帳票画像記入欄とみなし、各頂点のxy座標を領域座標として取得する。
+矩形領域取得では、矩形を帳票画像記入欄とみなし、各頂点の4つのxy座標を領域座標として取得する。
 以降、下線部の領域座標と区別するため、矩形領域の領域座標を、矩形領域座標と呼ぶ。
 取得した全ての矩形領域座標を、左上頂点のy座標を参照して昇順にソートし、0から順に番号を割り振る。
 各矩形領域について、割り振った番号と領域座標は、出力するJSONファイルにおいて、それぞれrects\_data配列内のidキーとcoordsオブジェクトとする。
@@ -179,7 +172,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \item 数値(number)
 \end{itemize}
 
-以上の属性から、取得文字の属性がいずれに該当するかを推測し、属性として取得する。
+取得文字の属性が、上記3つのうちのいずれに該当するかを推測し、属性として取得する。
 取得した属性は、ラベル割付(\ref{subsec:label_link}節で後述)で用いる。
 
 \subsection{ラベル割付}\label{subsec:label_link}
@@ -213,7 +206,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 また、図\ref{fig:rect_original}の画像に対し、本機能を適用した画像を、図\ref{fig:rect_drawing}に示す。
 図\ref{fig:rect_drawing}に示すように、矩形領域に対してランダムなRGBカラーで矩形を描画し、同色で矩形左上に番号と文字列を表示する。
 図\ref{fig:rect_drawing}の矩形に表示する番号は、JSONファイル内のrects\_data配列のidキーの値と一致する。
-同様に、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーのと一致する。
+同様に、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーの値と一致する。
 図\ref{fig:rect_drawing}の画像中にある、「単価」という文字がある矩形の左上頂点には、「0: number」と描画している。
 これは、rects\_data配列のidキーに0が、labelキーにnumberがそれぞれ対応することを示す。
 
@@ -242,7 +235,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
 図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
 同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
-図\ref{fig:rect_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: number」と描画している。
+図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
 これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
 
 \begin{figure}[t]

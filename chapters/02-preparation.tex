@@ -1,7 +1,6 @@
 \chapter{研究の準備}\label{cha:Preparation}
 本章では、本研究に必要な前提知識について説明する。
 
-
 \section{入力対象の画像}\label{sec:input_images}
 試作したツールの入力対象である画像については、以下の条件を全て満たす画像とする。
 なお、帳票は帳簿と伝票の総称であり、電子文書はWordやテキストファイルなど、デジタル情報として作成した文書を指し、電子化文書は紙媒体の書類をスキャンしたPDFファイルや画像の形式で保存した文書を指す\cite{電子文書と電子化文書}。
@@ -143,6 +142,7 @@ putText関数は、文字を画像に描画する関数である。
 DeblurGANv2は、敵対的生成ネットワーク(Generative Adversarial Network)をブレ除去に適用したツールである\cite{DeblurGANv2}。
 スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
 また、先行研究において、スマートフォンのカメラで撮影した画像に対して、複数の画像処理と共にDeblurGANv2を適用することによって、ブレ除去によって画像品質が向上し、Tesseract-OCR\cite{Tesseract-OCR}を用いた光学文字認識(\ref{sec:Optical-Charactor-Recognition}節で後述)の精度が向上することが示されている\cite{DeblurGANv2の先行研究}。
+
 本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節で後述)と文字情報取得部(\ref{sec:OCR_part}節で後述)で施す画像処理の一部に用いる。
 
 
@@ -151,25 +151,28 @@ DeblurGANv2は、敵対的生成ネットワーク(Generative Adversarial Networ
 本研究では、文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節で後述)で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
 また、本研究では、光学文字認識ソフトウェア\cite{光学文字認識ソフトウェア}の1つであるTesseract-OCRを、Python\cite{Python}のOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から用いる。
 PyOCRを用いる際に、文字を認識する処理にbuilderという変数をパラメータとして指定できる。
-本研究では、LineBoxBuilderを変数builderに指定することで、行単位で文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する。
+
+本研究では、変数builderについて、行単位で文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する、LineBoxBuilderを指定する。
 
 \section{Fugashi}\label{sec:Fugashi}
 Fugashiは、形態素解析ソフトウェアであるMecab\cite{Mecab}をPythonで使用する際のラッパーライブラリである\cite{Fugashi}。
-本研究では、除外判定処理(\ref{subsec:exclusion_judgement_processing}節で後述)で属性判定に不要な取得文字を、取得文字を構成する形態素の品詞を参照することによって、出力の対象外とするために用いる。
+
+本研究では、除外推測処理(\ref{subsec:exclusion_judgement_processing}節で後述)で属性推測処理に不要な取得文字を、取得文字を構成する形態素の品詞を参照することによって、出力の対象外とするために用いる。
 また、本研究でFugashiの解析に用いる辞書として、UniDic\cite{UniDic}を利用する。
 よって、本論文で記述する品詞体系は、UniDic品詞体系とする。
 UniDic品詞体系では、左からカンマ区切りで、大分類、中分類、小分類、細分類の順で品詞を列挙する\cite{UniDic品詞体系}。
 
 \section{Youri}\label{sec:Youri}
 Youriは、Llama2\cite{Llama2}に対し、日本語の学習データで継続事前学習を行うことによって、日本語のテキスト生成能力を高めた大規模言語モデルである\cite{Youri}。
-本研究では、属性推測処理(\ref{subsec:att_prediction_processing}節で後述)で取得文字の属性を判定するために用いる。
+
+本研究では、属性推測処理(\ref{subsec:att_prediction_processing}節で後述)で取得文字の属性を推測するために用いる。
 
 \section{IoU}\label{sec:IoU}
 IoUは、物体検出において、2つの領域の重なり度合いを表す指標であり、1.0で完全一致、0.0で重なりがないことを示す。
 
 IoUを算出する式を、以下に示す。
-なお、一般に、IoUは0.5を閾値として、閾値以上である場合は一致とみなされる\cite{IoU閾値}。
+なお、一般に、IoUは0.5を閾値として、閾値以上である場合は2つの領域は一致しているとみなされる\cite{IoU閾値}。
 
 \begin{equation}
-    \rm{IoU} = \frac{2つの領域の積集合}{2つの領域の和集合}
+    \rm{IoU} = \frac{2つの領域の積集合の面積}{2つの領域の和集合の面積}
 \end{equation}
