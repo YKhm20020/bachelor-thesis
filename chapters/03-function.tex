@@ -1,12 +1,12 @@
 \chapter{試作するツールの機能}\label{cha:Function}
 本章では、試作するツールの機能について説明する。
 試作するツールは、\ref{sec:input_images}節で述べた帳票画像を入力とする。
-出力は、領域の座標と、対応するラベルを組とするJSON(JavaScript Object Notation)形式のファイルと、領域の座標を帳票画像に描画したPNG(Portable Network Graphics)形式の画像である。
+出力は、領域の座標とそれに対応するラベルを組とするJSON(JavaScript Object Notation)形式のファイルと、領域の座標を帳票画像に描画したPNG(Portable Network Graphics)形式の画像である。
 出力する画像は、矩形の領域を描画した画像と、下線部の領域を描画した画像の2枚に分けている。
-これは、領域の誤検出によって、描画した矩形と直線が重なった場合に、視認性が低下することを防ぐためである。
+これは、領域を誤検出した際に、2つの領域が重なることで視認性が低下することを防ぐためである。
 なお、本研究で用いる用語を、表\ref{tb:term}に示す。
 
-\begin{table}[t]
+\begin{table}[tp]
 	\caption{本研究で用いる用語}
 	\label{tb:term}
 	\centering
@@ -14,24 +14,25 @@
         \hline
 		用語 & \multicolumn{1}{c|}{意味} \\
         \hline \hline
-		帳票画像記入欄 & 入力である帳票画像内の記入欄 \\
+		帳票画像内記入欄 & 入力である帳票画像内の記入欄 \\
         \hline
-		電子フォーム記入欄 & 試作するツールによって取得した座標で示す記入欄 \\
+		電子フォーム内記入欄 & 試作するツールによって取得した座標で示す記入欄 \\
         \hline
-		矩形領域 & 電子フォーム記入欄のうち、矩形で示された記入欄 \\
+		矩形領域 & 電子フォーム内記入欄のうち、矩形で示された記入欄 \\
         \hline
-		下線部領域 & 電子フォーム記入欄のうち、下線で示された記入欄 \\
+		下線部領域 & 電子フォーム内記入欄のうち、下線で示された記入欄 \\
         \hline
-        \multirow{3}{*}{領域座標} & 試作するツールによって取得する領域の座標 \\
-                                    & 矩形領域であれば、各頂点4つのxy座標にあたる \\
-                                    & 下線部領域であれば、両端点の2つのxy座標にあたる \\
+        \multirow{3}{*}{領域座標} & 試作するツールによって取得する領域の座標。 \\
+                                    & 矩形領域であれば、各頂点4つのxy座標にあたる。 \\
+                                    & 下線部領域であれば、両端点の2つのxy座標にあたる。 \\
         \hline
-        \multirow{2}{*}{文字情報} & 文字認識によって認識した文字と \\
+        \multirow{2}{*}{文字情報} & 光学文字認識によって認識した文字と \\
                                     & それを囲むバウンディングボックスの各頂点のxy座標 \\
         \hline
-        属性 & 文字認識によって得た文字から推測するデータ型 \\
+        \multirow{2}{*}{属性} & 文字認識によって得た文字から推測するデータ型。 \\
+                                & 本研究では、日付(date)、文字列(string)、数値(number)の3つとする。\\
         \hline
-        \multirow{2}{*}{ラベル} & 文字の近傍に存在する電子フォーム記入欄に対して\\
+        \multirow{2}{*}{ラベル} & 文字の近傍に存在する電子フォーム内記入欄に対して\\
                                     & 文字位置と属性から推測するデータ型 \\
         \hline
 	\end{tabular}
@@ -40,13 +41,11 @@
 本研究で試作するツールは、以下の2つの機能を持つ。
 
 \begin{itemize}
-    \item 領域座標取得およびラベル付与機能
+    \item 領域座標自動取得およびラベル割付機能
     \item 領域強調画像出力機能
 \end{itemize}
 
 試作するツールの入力対象である帳票画像の例を、図\ref{fig:original}に示す。
-また、図\ref{fig:original}に対して、試作するツールを適用し、出力したJSONファイルの一部を、図\ref{fig:example_output_json}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -57,34 +56,9 @@
     \end{center}
 \end{figure}
 
-なお、出力するJSONファイルは、矩形領域のラベルと領域の座標をまとめたrects\_data配列と、下線部領域のラベルと領域座標をまとめたunderlines\_data配列で構成する。
-rects\_data配列は、以下のキーとオブジェクトから構成する。
-
-\begin{itemize}
-    \item 取得した矩形の領域座標のうち、どの領域座標かを一意に定める番号を示すidキー
-    \item 領域座標に割り付けたラベルを示すlabelキー
-    \item 矩形の領域座標をまとめたcoordsオブジェクト
-    \begin{itemize}
-        \item 左上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_leftオブジェクト
-        \item 左下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_leftオブジェクト
-        \item 右下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_rightオブジェクト
-        \item 右上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_rightオブジェクト
-    \end{itemize}
-\end{itemize}
-
-また、underlines\_data配列は、以下のキーとオブジェクトから構成する。
-\begin{itemize}
-    \item 取得した下線部の領域座標のうち、どの領域座標かを一意に定める番号を示すidキー
-    \item 領域座標に割り付けたラベルを示すlabelキー
-    \item 下線部の領域座標をまとめたcoordsオブジェクト
-    \begin{itemize}
-        \item 左端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するleftオブジェクト
-        \item 右端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するrightオブジェクト
-    \end{itemize}
-\end{itemize}
-
+また、図\ref{fig:original}に対して、試作するツールを適用し、出力したJSONファイルの一部を、図\ref{fig:example_output_json}に示す。
 \lstset{language=}
-\begin{figure}[t]
+\begin{figure}[tp]
     \begin{lstlisting}
     {
         "rects_data": [
@@ -132,11 +106,38 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \caption{出力するJSONファイルの一部}\label{fig:example_output_json}
 \end{figure}
 
-\section{領域座標取得およびラベル付与機能}\label{sec:eform_write_space_obtainment_feature}
-領域座標取得およびラベル付与機能は、帳票画像中の矩形領域および下線部領域について、領域座標を電子フォーム記入欄として取得し、それぞれにラベルを割り付ける機能である。
+なお、出力するJSONファイルは、矩形領域のラベルと領域座標をまとめたrects\_data配列と、下線部領域のラベルと領域座標をまとめたunderlines\_data配列で構成する。
+rects\_data配列は、以下のキーとオブジェクトから構成する。
+
+\begin{itemize}
+    \item 取得した矩形の領域座標のうち、どの領域座標かを一意に定める番号を示すidキー
+    \item 領域座標に割り付けたラベルを示すlabelキー
+    \item 矩形の領域座標をまとめたcoordsオブジェクト
+    \begin{itemize}
+        \item 左上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_leftオブジェクト
+        \item 左下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_leftオブジェクト
+        \item 右下頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するbottom\_rightオブジェクト
+        \item 右上頂点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するtop\_rightオブジェクト
+    \end{itemize}
+\end{itemize}
+
+また、underlines\_data配列は、以下のキーとオブジェクトから構成する。
+
+\begin{itemize}
+    \item 取得した下線部の領域座標のうち、どの領域座標かを一意に定める番号を示すidキー
+    \item 領域座標に割り付けたラベルを示すlabelキー
+    \item 下線部の領域座標をまとめたcoordsオブジェクト
+    \begin{itemize}
+        \item 左端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するleftオブジェクト
+        \item 右端点のxy座標を示し、xキーとyキーにそれぞれx座標とy座標が対応するrightオブジェクト
+    \end{itemize}
+\end{itemize}
+
+\section{領域座標自動取得およびラベル割付機能}\label{sec:eform_write_space_obtainment_feature}
+領域座標自動取得およびラベル割付機能は、帳票画像中の矩形領域および下線部領域について、領域座標を電子フォーム内記入欄として取得し、それぞれにラベルを割り付ける機能である。
 ラベルを割り付けることにより、バリデーションチェック(\ref{sec:validation_check}節を参照)に必要な情報を付与することができる。
 
-電子フォーム記入欄の取得とラベルの割り付けは、以下の手順で行う。
+電子フォーム内記入欄の取得とラベルの割り付けは、以下の手順で行う。
 
 \begin{enumerate}
     \item 矩形領域取得
@@ -147,15 +148,15 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 \end{enumerate}
 
 \subsection{矩形領域取得}\label{subsec:rect_coords_obtainment}
-矩形領域取得では、矩形を帳票画像記入欄とみなし、各頂点の4つのxy座標を領域座標として取得する。
+矩形領域取得では、矩形を帳票画像内記入欄とみなし、各頂点の4つのxy座標を領域座標として取得する。
 以降、下線部の領域座標と区別するため、矩形領域の領域座標を、矩形領域座標と呼ぶ。
-取得した全ての矩形領域座標を、左上頂点のy座標を参照して昇順にソートし、0から順に番号を割り振る。
+取得した全ての矩形領域座標を、左上頂点のy座標について昇順にソートし、0から順に番号を割り振る。
 各矩形領域について、割り振った番号と領域座標は、出力するJSONファイルにおいて、それぞれrects\_data配列内のidキーとcoordsオブジェクトとする。
 
 \subsection{下線部領域取得}\label{subsec:underline_coords_obtainment}
-下線部領域取得では、水平な直線を帳票画像記入欄とみなし、両端点の2つのxy座標を領域座標として取得する。
+下線部領域取得では、水平な直線を帳票画像内記入欄とみなし、両端点の2つのxy座標を領域座標として取得する。
 以降、矩形の領域座標と区別するため、下線部領域の領域座標を、下線部領域座標と呼ぶ。
-取得した全ての下線部領域座標を、左端点のy座標を参照して昇順にソートし、0から順に番号を割り振る。
+取得した全ての下線部領域座標を、左端点のy座標について昇順にソートし、0から順に番号を割り振る。
 各下線部領域について、割り振った番号と領域座標は、出力するJSONファイルにおいて、それぞれunderlines\_data配列内のidキーとcoordsオブジェクトとする。
 
 \subsection{文字情報取得}\label{subsec:char_information_obtainment}
@@ -163,7 +164,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 取得文字と文字位置は、それぞれ属性推測(\ref{subsec:att_prediction}節で後述)と、ラベル割付(\ref{subsec:label_link}節で後述)で用いる。
 
 \subsection{属性推測}\label{subsec:att_prediction}
-属性推測では、取得文字に対して、大規模言語モデルによる属性の推測を行う。
+属性推測では、取得文字に対して、大規模言語モデルYouriによる属性の推測を行う。
 本研究で用いる3つの属性を、以下に示す。
 
 \begin{itemize}
@@ -176,16 +177,14 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 取得した属性は、ラベル割付(\ref{subsec:label_link}節で後述)で用いる。
 
 \subsection{ラベル割付}\label{subsec:label_link}
-\ref{subsec:rect_coords_obtainment}節と\ref{subsec:underline_coords_obtainment}節で述べた領域座標と、\ref{subsec:char_information_obtainment}節で述べた文字位置、\ref{subsec:att_prediction}節で述べた属性を用いる。
-文字位置の近傍に存在する領域座標を対象に属性を割り付け、ラベルとして得る。
+矩形領域取得(\ref{subsec:rect_coords_obtainment}節を参照)と下線部領域取得(\ref{subsec:underline_coords_obtainment}節を参照)で取得した領域座標、文字情報取得(\ref{subsec:char_information_obtainment}節を参照)で取得した文字位置、属性推測(\ref{subsec:att_prediction}節を参照)で取得した属性を用いる。
+文字位置の近傍に存在する領域座標を対象に属性を割り付け、ラベルとして取得する。
 出力するJSONファイルにおける、rects\_data配列、およびunderlines\_data配列内の、labelキーの値を取得する。
-なお、ラベルを更新する順番は、文字位置をy座標を昇順にソートし、同じy座標が同じ場合は、さらにx座標を昇順にソートした順番とする。
+なお、ラベルを更新する順番は、文字位置をy座標について昇順にソートし、y座標が同じ場合は、さらにx座標について昇順にソートした順番とする。
 これによって、日本語の帳票を左から右へ、上から下へ書き進める順番に対応して、ラベルを更新することができる。
 例として、記入方向が変わる帳票の一部を、図\ref{fig:label_order}に示す。
-図\ref{fig:label_order}の「合計」の列に、別の内容を記入する帳票画像記入欄が配置されている。
-このように、縦に記入する帳票画像記入欄の中に、横に記入する帳票画像記入欄がある場合についても、文字位置をソートした順番でラベルを更新することで、別の文字の属性を参照し、本来割り付けるべきラベルとは異なるラベルを誤って割り付けることを防ぐ。
 
-\begin{figure}[t]
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/label_order.jpg}
@@ -195,22 +194,19 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \end{center}
 \end{figure}
 
+図\ref{fig:label_order}の「合計」の列に、別の内容を記入する帳票画像内記入欄が配置されている。
+このように、縦に記入する帳票画像内記入欄(図\ref{fig:label_order}の青い矢印)の中に、横に記入する帳票画像内記入欄(図\ref{fig:label_order}の赤い矢印)がある場合についても、文字位置をソートした順番でラベルを更新することで、別の文字の属性を参照し、本来割り付けるべきラベルとは異なるラベルを誤って割り付けることを防ぐ。
+
 \section{領域強調画像出力機能}\label{sec:highlighted_area_image_output}
-領域強調画像出力機能は、入力である帳票画像に対して、取得した領域座標とラベルを描画することによって、強調表示したPNG画像を出力する機能である。
-これによって、\ref{sec:eform_write_space_obtainment_feature}節で述べた、領域座標取得およびラベル付与機能で出力したJSONファイルの内容を、目視で確認しやすくなる。
+領域強調画像出力機能は、入力である帳票画像に対して、取得した領域とラベルを描画することによって、取得した領域を強調表示したPNG画像を出力する機能である。
+これによって、\ref{sec:eform_write_space_obtainment_feature}節で述べた、領域座標自動取得およびラベル割付機能で出力したJSONファイルの内容を、目視で確認しやすくする。
 本機能で出力する画像は、矩形領域を強調した矩形領域強調画像と、下線部領域を強調した下線部領域強調画像の計2枚である。
-矩形領域強調画像は、ランダムなRGBカラーで矩形を描画し、下線部領域強調画像は、緑色で直線を描画する。
-矩形をランダムなRGBカラーで描画する理由は、矩形領域が隣接する際に、視認性が低下することを防ぐためである。
+矩形領域強調画像は、ランダムな色で矩形を描画し、下線部領域強調画像は、緑色で直線を描画する。
+矩形をランダムな色で描画する理由は、矩形領域が隣接する際に、視認性が低下することを防ぐためである。
 
-図\ref{fig:original}に示した帳票画像記入欄のうち、矩形の帳票画像記入欄の一部を切り取った画像を、図\ref{fig:rect_original}に示す。
-また、図\ref{fig:rect_original}の画像に対し、本機能を適用した画像を、図\ref{fig:rect_drawing}に示す。
-図\ref{fig:rect_drawing}に示すように、矩形領域に対してランダムなRGBカラーで矩形を描画し、同色で矩形左上に番号と文字列を表示する。
-図\ref{fig:rect_drawing}の矩形に表示する番号は、JSONファイル内のrects\_data配列のidキーの値と一致する。
-同様に、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーの値と一致する。
-図\ref{fig:rect_drawing}の画像中にある、「単価」という文字がある矩形の左上頂点には、「0: number」と描画している。
-これは、rects\_data配列のidキーに0が、labelキーにnumberがそれぞれ対応することを示す。
+図\ref{fig:original}に示した帳票画像内記入欄のうち、矩形の帳票画像内記入欄の一部を切り取った画像を、図\ref{fig:rect_original}に示す。
 
-\begin{figure}[t]
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/rect_original.jpg}
@@ -220,25 +216,29 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \end{center}
 \end{figure}
 
-\begin{figure}[t]
+また、図\ref{fig:rect_original}の画像に対し、本機能を適用した画像を、図\ref{fig:rect_drawing}に示す。
+
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/rects_with_label.jpg}
         }
-        \caption{取得した矩形領域座標の描画}
+        \caption{図\ref{fig:rect_original}の帳票画像内記入欄から取得した矩形領域の描画}
         \label{fig:rect_drawing}
     \end{center}
 \end{figure}
 
-図\ref{fig:original}内にある帳票画像記入欄のうち、下線部の帳票画像記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
-また、図\ref{fig:underline_original}の画像に対し、下線部領域座標とラベルを取得し描画した画像を、図\ref{fig:underline_drawing}に示す。
-図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
-図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
-同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
-図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
-これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
+図\ref{fig:rect_drawing}に示すように、矩形領域に対してランダムな色で矩形を描画し、同色で矩形左上に番号と文字列を描画する。
+図\ref{fig:rect_drawing}の矩形に表示する番号は、JSONファイル内のrects\_data配列のidキーの値と一致する。
+また、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーの値と一致する。
+図\ref{fig:rect_drawing}の画像中にある、「単価」という文字がある矩形の左上頂点には、「0: number」と描画している。
+これは、rects\_data配列のidキーに0が、labelキーにnumberがそれぞれ対応することを示す。
+よって、矩形領域について、JSONファイルの情報を帳票画像上に描画することで可視化し、矩形領域強調画像として出力することによって、目視でJSONファイルの内容を確認しやすくしていることがわかる。
 
-\begin{figure}[t]
+図\ref{fig:original}内にある帳票画像内記入欄のうち、下線部の帳票画像内記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
+また、図\ref{fig:underline_original}の画像に対し、下線部領域座標とラベルを取得し描画した画像を、図\ref{fig:underline_drawing}に示す。
+
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/underline_original.jpg}
@@ -248,12 +248,19 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
     \end{center}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[htp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/underlines_with_label.jpg}
         }
-        \caption{取得した下線部領域座標の描画}
+        \caption{図\ref{fig:underline_original}の帳票画像内記入欄から取得した下線部領域の描画}
         \label{fig:underline_drawing}
     \end{center}
 \end{figure}
+
+図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
+図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
+同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
+図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
+これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
+よって、下線部領域について、JSONファイルの情報を帳票画像上に描画することで可視化し、下線部領域強調画像として出力することによって、目視でJSONファイルの内容を確認しやすくしていることがわかる。
