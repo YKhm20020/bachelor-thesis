@@ -1,7 +1,6 @@
 \chapter{適用例}\label{cha:Indication}
-本章では、本研究で試作したツールが正しく動作することを確認する。
-適用例として、試作したツールを適用する帳票画像を、図\ref{fig:indication_original}に示す。
-
+本章では、本研究で試作したツールが正しく動作することを、適用例を用いて確認する。
+試作したツールに適用する帳票画像を、図\ref{fig:indication_original}に示す。
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -12,7 +11,7 @@
     \end{center}
 \end{figure}
 
-図\ref{fig:indication_original}に対して、試作したツールを適用し、出力であるJSONファイルと、矩形領域強調画像と下線部領域強調画像の2枚が、実際の矩形領域と下線部領域の位置とラベルがそれぞれ一致することを確認する。
+図\ref{fig:indication_original}に対して、試作したツールを適用し、出力であるJSONファイルと、矩形領域強調画像と下線部領域強調画像の2枚が、測定した矩形領域、下線部領域の位置、および、ラベルとそれぞれ一致することを確認する。
 具体的には、JSONファイルのrects\_data配列と、矩形領域強調画像を参照し、矩形領域の出力結果を確認する。
 同様に、JSONファイル内のunderlines\_data配列と、下線部領域強調画像を参照し、下線部領域の出力結果を確認する。
 
@@ -20,7 +19,6 @@
 本節は、矩形領域についての出力結果を確認する。
 
 図\ref{fig:indication_original}に対して、試作したツールを適用し、出力したJSONファイルのうち、rects\_data配列の一部を、図\ref{fig:rects_data_json}に示す。
-
 \lstset{language=}
 \begin{figure}[tp]
     \begin{lstlisting}
@@ -71,9 +69,7 @@
     \end{lstlisting}
     \caption{rects\_data配列の一部}\label{fig:rects_data_json}
 \end{figure}
-
-図\ref{fig:rects_data_json}のJSONファイルと同時に出力した2枚の領域強調画像のうち、矩形領域を強調した画像の一部を、図\ref{fig:highlighted_rects_part}に示す。
-
+また、図\ref{fig:rects_data_json}のJSONファイルと同時に出力した2枚の領域強調画像のうち、矩形領域を強調した画像の一部を、図\ref{fig:highlighted_rects_part}に示す。
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -86,7 +82,7 @@
 
 矩形領域座標について、IoU(Intersection over Union)を用いてJSONファイルの出力が正しいことを確認する。
 
-実際の矩形領域座標と、出力するJSONファイルの矩形領域座標を確認し、IoUを算出する。
+測定したの矩形領域座標と、出力するJSONファイルの矩形領域座標を確認し、IoUを算出する。
 図\ref{fig:rects_data_json}より、idキーの値が4である矩形領域座標は、左上頂点のxy座標が(275,817)であり、右下頂点のxy座標が(1008,903)である。
 図\ref{fig:highlighted_rects_part}にある4番の矩形領域について、図\ref{fig:indication_original}の画像では、左上頂点のxy座標が(273,816)であり、右下頂点のxy座標が(1009,905)であった。
 よって、IoUを算出すると、0.96となる。
@@ -96,14 +92,13 @@ IoUが閾値である0.5以上であるため、この矩形領域座標は正�
 ラベルについて、人間が判断したラベルと、ツールが出力したラベルが一致するかを確認する。
 図\ref{fig:rects_data_json}より、idキーの値が4と5である矩形領域について、それぞれラベルはstring、numberである。
 図\ref{fig:highlighted_rects_part}より、画像内に描画した矩形領域の番号のうち、4番の矩形領域は「品名」を記入する欄であり、5番の矩形領域は「数量」を記入する欄であることがわかる。
-各矩形領域のラベルについて、「品名」は文字列(string)、「数量」は数値(number)がそれぞれ正しいラベルであるため、これら2つの矩形領域については、正しいラベルを割り付けていることを確認できた。
+各矩形領域のラベルについて、「品名」は文字列(string)、「数量」は数値(number)がそれぞれ正しいラベルであるため、これら2つの矩形領域について、正しいラベルを割り付けていることを確認できた。
 他の矩形領域に対しても、一部を除き、正しいラベルを割り付けていることを確認した。
 
-また、矩形領域について、JSONファイルと領域強調画像の出力が対応することから、帳票画像のレイアウトを変更せず、矩形領域の領域座標とラベルを出力できたことがわかる。
+また、矩形領域について、JSONファイルと領域強調画像の出力が対応することから、帳票画像のレイアウトを保持したまま、矩形領域の領域座標とラベルを出力できたことがわかる。
 
 一部の矩形領域については、本来割り付けるべきラベルとは異なるラベルを誤って割り付けた。
 JSONファイルのうち、誤ったラベルを割り付けた矩形領域座標を、図\ref{fig:rects_data_miss_json}に示す。
-
 \lstset{language=}
 \begin{figure}[tp]
     \begin{lstlisting}
@@ -132,9 +127,7 @@ JSONファイルのうち、誤ったラベルを割り付けた矩形領域座�
     \end{lstlisting}
     \caption{誤ったラベルを割り付けた矩形領域座標}\label{fig:rects_data_miss_json}
 \end{figure}
-
 また、図\ref{fig:rects_data_miss_json}に示した矩形領域座標に対応する矩形領域強調画像を、図\ref{fig:highlighted_rects_miss_part}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -144,14 +137,12 @@ JSONファイルのうち、誤ったラベルを割り付けた矩形領域座�
         \label{fig:highlighted_rects_miss_part}
     \end{center}
 \end{figure}
-
 図\ref{fig:rects_data_miss_json}より、idキーの値が25の矩形領域は、labelキーの値がstringであることがわかる。
 図\ref{fig:highlighted_rects_miss_part}より、25番の矩形領域は、「小計」を記入する欄であることがわかる。
 本来割り付けるべきラベルは数値(number)であるため、誤ったラベルを割り付けていることがわかる。
 これは、「小計」という文字を認識することができなかったことが原因である。
 
 図\ref{fig:indication_original}の画像に対して、認識した文字のバウンディングボックスを描画した画像の一部を、図\ref{fig:OCR_result}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -172,7 +163,6 @@ JSONファイルのうち、誤ったラベルを割り付けた矩形領域座�
 
 図\ref{fig:indication_original}に対して、試作したツールを適用し、出力したJSONファイルのうち、underlines\_data配列の一部を、図\ref{fig:underlines_data_json}に示す。
 また、図\ref{fig:underlines_data_json}のJSONファイルと同時に出力した2枚の下線部強調画像のうち、下線部領域を強調した画像の一部を図\ref{fig:highlighted_underlines_part}に示す。
-
 \lstset{language=}
 \begin{figure}[tp]
     \begin{lstlisting}
@@ -203,7 +193,6 @@ JSONファイルのうち、誤ったラベルを割り付けた矩形領域座�
     \end{lstlisting}
     \caption{underlines\_data配列の一部}\label{fig:underlines_data_json}
 \end{figure}
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -213,10 +202,9 @@ JSONファイルのうち、誤ったラベルを割り付けた矩形領域座�
         \label{fig:highlighted_underlines_part}
     \end{center}
 \end{figure}
-
 下線部領域座標について、矩形領域座標と同様に、IoUを用いてJSONファイルの出力が正しいことを確認する。
 なお、下線部領域については、高さを3ピクセルとしてIoUを計算する。
-実際の下線部領域座標と、出力するJSONファイルの下線部領域座標を確認し、IoUを算出する。
+測定した下線部領域座標と、出力するJSONファイルの下線部領域座標を確認し、IoUを算出する。
 図\ref{fig:underlines_data_json}より、idキーの値が0である下線部領域座標は、左端点のxy座標が(869,354)であり、右端点のxy座標が(1512,354)である。
 図\ref{fig:highlighted_underlines_part}にある0番の下線部領域について、図\ref{fig:indication_original}の画像では、左端点のxy座標が(869,354)であり、右端点のxy座標が(1511,354)であった。
 よって、IoUを算出すると、0.99となる。
@@ -226,10 +214,10 @@ IoUが閾値である0.5以上であるため、この下線部領域座標は�
 下線部領域のラベルについて、人間が判断したラベルと、ツールが出力したラベルが一致するかを確認する。
 図\ref{fig:underlines_data_json}より、idキーの値は0と1であり、それぞれラベルはdate、numberである。
 図\ref{fig:highlighted_underlines_part}より、画像内に描画した矩形領域の番号のうち、0番の下線部領域は「年月日」を記入する欄であり、1番の下線部領域は番号である「No.」を記入する欄であることがわかる。
-「年月日」は日付(date)、「No.」は数値(number)がそれぞれ正しいラベルであるため、これら2つの下線部領域については、正しいラベルを割り付けていることを確認できた。
+「年月日」は日付(date)、「No.」は数値(number)がそれぞれ正しいラベルであるため、これら2つの下線部領域について、正しいラベルを割り付けていることを確認できた。
 他の下線部領域に対しても、一部を除き、正しいラベルを割り付けていることを確認した。
 
-また、下線部領域について、JSONファイルと領域強調画像の出力が対応することから、帳票画像のレイアウトを変更することなく、下線部領域の領域座標とラベルを出力できたことがわかる。
+また、下線部領域について、JSONファイルと領域強調画像の出力が対応することから、帳票画像のレイアウトを保持したまま、下線部領域の領域座標とラベルを出力できたことがわかる。
 
 一部の下線部領域については、本来割り付けるべきラベルとは異なるラベルを誤って割り付けた。
 JSONファイルのうち、誤ったラベルを割り付けた下線部領域座標を、図\ref{fig:underlines_data_miss_json}に示す。

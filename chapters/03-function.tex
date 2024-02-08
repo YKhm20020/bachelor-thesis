@@ -36,6 +36,7 @@
         \hline
 	\end{tabular}
 \end{table}
+
 本研究で試作するツールは、以下の2つの機能を持つ。
 
 \begin{itemize}
@@ -132,7 +133,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 \end{itemize}
 
 \section{領域座標自動取得およびラベル割付機能}\label{sec:eform_write_space_obtainment_feature}
-領域座標自動取得およびラベル割付機能は、帳票画像中の矩形領域および下線部領域について、領域座標を電子フォーム内記入欄として取得し、それぞれにラベルを割り付ける機能である。
+領域座標自動取得およびラベル割付機能は、帳票画像中の矩形領域および下線部領域について、それらの領域座標を電子フォーム内記入欄として取得し、それぞれにラベルを割り付ける機能である。
 ラベルを割り付けることにより、バリデーションチェック(\ref{sec:validation_check}節を参照)に必要な情報を付与することができる。
 
 電子フォーム内記入欄の取得とラベルの割り付けは、以下の手順で行う。
@@ -175,23 +176,8 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 取得した属性は、ラベル割付(\ref{subsec:label_link}節で後述)で用いる。
 
 \subsection{ラベル割付}\label{subsec:label_link}
-矩形領域取得(\ref{subsec:rect_coords_obtainment}節を参照)と下線部領域取得(\ref{subsec:underline_coords_obtainment}節を参照)で取得した領域座標、文字情報取得(\ref{subsec:char_information_obtainment}節を参照)で取得した文字位置、属性推測(\ref{subsec:att_prediction}節を参照)で取得した属性を用いる。
-文字位置の近傍に存在する領域座標を対象に属性を割り付け、ラベルとして取得する。
+矩形領域取得(\ref{subsec:rect_coords_obtainment}節を参照)と下線部領域取得(\ref{subsec:underline_coords_obtainment}節を参照)で取得した領域座標、文字情報取得(\ref{subsec:char_information_obtainment}節を参照)で取得した文字位置、属性推測(\ref{subsec:att_prediction}節を参照)で取得した属性を用いて、文字位置の近傍に存在する領域座標を対象に属性を割り付け、ラベルとして取得する。
 出力するJSONファイルにおける、rects\_data配列、およびunderlines\_data配列内の、labelキーの値を取得する。
-なお、ラベルを更新する順番は、文字位置をy座標について昇順にソートし、y座標が同じ場合は、さらにx座標について昇順にソートした順番とする。
-これによって、日本語の帳票を書き進める順、すなわち左から右へ、上から下へラベルを更新することができる。
-例として、記入方向が変わる帳票の一部を、図\ref{fig:label_order}に示す。
-\begin{figure}[tp]
-    \begin{center}
-        \fbox{
-            \includegraphics[width=15cm]{image/03-function/label_order.jpg}
-        }
-        \caption{記入方向が変わる帳票の例}
-        \label{fig:label_order}
-    \end{center}
-\end{figure}
-図\ref{fig:label_order}の「合計」の列に、別の内容を記入する帳票画像内記入欄が配置されている。
-このように、同じ内容を記入する縦方向に配置された帳票画像内記入欄(図\ref{fig:label_order}の青い矢印)の下に、別の内容を記入する横方向に配置された帳票画像内記入欄(図\ref{fig:label_order}の赤い矢印)がある場合についても、文字位置をソートした順番でラベルを更新することで、別の文字の属性を参照し、誤ったラベルを割り付けることを防ぐ。
 
 \section{領域強調画像出力機能}\label{sec:highlighted_area_image_output}
 領域強調画像出力機能は、入力である帳票画像に対して、取得した領域とラベルを描画することによって、取得した領域を強調表示したPNG画像を出力する機能である。
@@ -229,14 +215,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 
 図\ref{fig:original}内にある帳票画像内記入欄のうち、下線部の帳票画像内記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
 また、図\ref{fig:underline_original}の画像に対し、下線部領域座標とラベルを取得し描画した画像を、図\ref{fig:underline_drawing}に示す。
-
-図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
-図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
-同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
-図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
-これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
-このように、下線部領域強調画像を出力することで、下線部領域についてJSONファイルの内容を可視化し、目視でJSONファイルの内容を確認できる。
-\begin{figure}[tp]
+\begin{figure}[t]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/underline_original.jpg}
@@ -245,7 +224,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
         \label{fig:underline_original}
     \end{center}
 \end{figure}
-\begin{figure}[tp]
+\begin{figure}[t]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/underlines_with_label.jpg}
@@ -254,3 +233,23 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
         \label{fig:underline_drawing}
     \end{center}
 \end{figure}
+% \begin{figure}[tp]
+%     \centering
+%     \fbox{
+%         \includegraphics[width=15cm]{image/03-function/underline_original.jpg}
+%     }
+%     \caption{帳票画像にある下線部の記入欄}
+%     \label{fig:underline_original}
+%     \fbox{
+%         \includegraphics[width=15cm]{image/03-function/underlines_with_label.jpg}
+%     }
+%     \caption{図\ref{fig:underline_original}の帳票画像内記入欄から取得した下線部領域の描画}
+%     \label{fig:underline_drawing}
+% \end{figure}
+図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
+図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
+同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
+図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
+これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
+このように、下線部領域強調画像を出力することで、下線部領域についてJSONファイルの内容を可視化し、目視でJSONファイルの内容を確認できる。
+
