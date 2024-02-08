@@ -5,7 +5,6 @@
 出力する画像は、矩形の領域を描画した画像と、下線部の領域を描画した画像の2枚に分けている。
 これは、領域を誤検出した際に、2つの領域が重なることで視認性が低下することを防ぐためである。
 なお、本研究で用いる用語を、表\ref{tb:term}に示す。
-
 \begin{table}[tp]
 	\caption{本研究で用いる用語}
 	\label{tb:term}
@@ -29,15 +28,14 @@
         \multirow{2}{*}{文字情報} & 光学文字認識によって認識した文字と \\
                                     & それを囲むバウンディングボックスの各頂点のxy座標 \\
         \hline
-        \multirow{2}{*}{属性} & 文字認識によって得た文字から推測するデータ型。 \\
+        \multirow{2}{*}{属性} & 光学文字認識によって得た文字から推測するデータ型。 \\
                                 & 本研究では、日付(date)、文字列(string)、数値(number)の3つとする。\\
         \hline
-        \multirow{2}{*}{ラベル} & 文字の近傍に存在する電子フォーム内記入欄に対して\\
-                                    & 文字位置と属性から推測するデータ型 \\
+        \multirow{2}{*}{ラベル} & 文字の近傍に存在する電子フォーム内記入欄に対して \\
+                                & 文字位置と属性から推測するデータ型 \\
         \hline
 	\end{tabular}
 \end{table}
-
 本研究で試作するツールは、以下の2つの機能を持つ。
 
 \begin{itemize}
@@ -160,7 +158,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 各下線部領域について、割り振った番号と領域座標は、出力するJSONファイルにおいて、それぞれunderlines\_data配列内のidキーとcoordsオブジェクトとする。
 
 \subsection{文字情報取得}\label{subsec:char_information_obtainment}
-文字情報取得では、入力である帳票画像に対して文字認識を行い、検出した文字を取得文字とし、検出した文字を囲むバウンディングボックスの各頂点の座標を文字位置として、それぞれ取得する。
+文字情報取得では、入力である帳票画像に対して光学文字認識を行い、検出した文字を取得文字とし、検出した文字を囲むバウンディングボックスの各頂点の座標を文字位置として、それぞれ取得する。
 取得文字と文字位置は、それぞれ属性推測(\ref{subsec:att_prediction}節で後述)と、ラベル割付(\ref{subsec:label_link}節で後述)で用いる。
 
 \subsection{属性推測}\label{subsec:att_prediction}
@@ -181,9 +179,8 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 文字位置の近傍に存在する領域座標を対象に属性を割り付け、ラベルとして取得する。
 出力するJSONファイルにおける、rects\_data配列、およびunderlines\_data配列内の、labelキーの値を取得する。
 なお、ラベルを更新する順番は、文字位置をy座標について昇順にソートし、y座標が同じ場合は、さらにx座標について昇順にソートした順番とする。
-これによって、日本語の帳票を左から右へ、上から下へ書き進める順番に対応して、ラベルを更新することができる。
+これによって、日本語の帳票を書き進める順、すなわち左から右へ、上から下へラベルを更新することができる。
 例として、記入方向が変わる帳票の一部を、図\ref{fig:label_order}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -193,9 +190,8 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
         \label{fig:label_order}
     \end{center}
 \end{figure}
-
 図\ref{fig:label_order}の「合計」の列に、別の内容を記入する帳票画像内記入欄が配置されている。
-このように、縦に記入する帳票画像内記入欄(図\ref{fig:label_order}の青い矢印)の中に、横に記入する帳票画像内記入欄(図\ref{fig:label_order}の赤い矢印)がある場合についても、文字位置をソートした順番でラベルを更新することで、別の文字の属性を参照し、本来割り付けるべきラベルとは異なるラベルを誤って割り付けることを防ぐ。
+このように、同じ内容を記入する縦方向に配置された帳票画像内記入欄(図\ref{fig:label_order}の青い矢印)の下に、別の内容を記入する横方向に配置された帳票画像内記入欄(図\ref{fig:label_order}の赤い矢印)がある場合についても、文字位置をソートした順番でラベルを更新することで、別の文字の属性を参照し、誤ったラベルを割り付けることを防ぐ。
 
 \section{領域強調画像出力機能}\label{sec:highlighted_area_image_output}
 領域強調画像出力機能は、入力である帳票画像に対して、取得した領域とラベルを描画することによって、取得した領域を強調表示したPNG画像を出力する機能である。
@@ -205,7 +201,6 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
 矩形をランダムな色で描画する理由は、矩形領域が隣接する際に、視認性が低下することを防ぐためである。
 
 図\ref{fig:original}に示した帳票画像内記入欄のうち、矩形の帳票画像内記入欄の一部を切り取った画像を、図\ref{fig:rect_original}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -215,29 +210,32 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
         \label{fig:rect_original}
     \end{center}
 \end{figure}
-
 また、図\ref{fig:rect_original}の画像に対し、本機能を適用した画像を、図\ref{fig:rect_drawing}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/rects_with_label.jpg}
         }
-        \caption{図\ref{fig:rect_original}の帳票画像内記入欄から取得した矩形領域の描画}
+        \caption{図\ref{fig:rect_original}から取得した矩形領域の描画}
         \label{fig:rect_drawing}
     \end{center}
 \end{figure}
-
 図\ref{fig:rect_drawing}に示すように、矩形領域に対してランダムな色で矩形を描画し、同色で矩形左上に番号と文字列を描画する。
 図\ref{fig:rect_drawing}の矩形に表示する番号は、JSONファイル内のrects\_data配列のidキーの値と一致する。
 また、番号の右に表示する文字列は、JSONファイル内のrects\_data配列のlabelキーの値と一致する。
 図\ref{fig:rect_drawing}の画像中にある、「単価」という文字がある矩形の左上頂点には、「0: number」と描画している。
 これは、rects\_data配列のidキーに0が、labelキーにnumberがそれぞれ対応することを示す。
-よって、矩形領域について、JSONファイルの情報を帳票画像上に描画することで可視化し、矩形領域強調画像として出力することによって、目視でJSONファイルの内容を確認しやすくしていることがわかる。
+このように、矩形領域強調画像を出力することで、矩形領域についてJSONファイルの内容を可視化し、目視でJSONファイルの内容を確認できる。
 
 図\ref{fig:original}内にある帳票画像内記入欄のうち、下線部の帳票画像内記入欄を切り取った画像を、図\ref{fig:underline_original}に示す。
 また、図\ref{fig:underline_original}の画像に対し、下線部領域座標とラベルを取得し描画した画像を、図\ref{fig:underline_drawing}に示す。
 
+図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
+図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
+同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
+図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
+これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
+このように、下線部領域強調画像を出力することで、下線部領域についてJSONファイルの内容を可視化し、目視でJSONファイルの内容を確認できる。
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -247,8 +245,7 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
         \label{fig:underline_original}
     \end{center}
 \end{figure}
-
-\begin{figure}[htp]
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/03-function/underlines_with_label.jpg}
@@ -257,10 +254,3 @@ rects\_data配列は、以下のキーとオブジェクトから構成する。
         \label{fig:underline_drawing}
     \end{center}
 \end{figure}
-
-図\ref{fig:underline_drawing}に示すように、下線部領域に対して緑色で直線を描画し、同色で直線の左端点に番号と文字列を表示する。
-図\ref{fig:underline_drawing}の下線部に表示する番号は、JSONファイル内のunderlines\_data配列のidキーの値と一致する。
-同様に、番号の右に表示する文字列は、JSONファイル内のunderlines\_data配列のlabelキーの値と一致する。
-図\ref{fig:underline_drawing}の画像中にある、「御中」という文字の左にある下線部の左端点には、「0: string」と描画している。
-これは、underlines\_data配列のidキーに0が、labelキーにstringがそれぞれ対応することを示す。
-よって、下線部領域について、JSONファイルの情報を帳票画像上に描画することで可視化し、下線部領域強調画像として出力することによって、目視でJSONファイルの内容を確認しやすくしていることがわかる。

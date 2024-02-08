@@ -63,8 +63,8 @@ cvtColor関数は、画像の色空間を変換する関数である。
 
 \paragraph{getStructuringElement関数}
 getStructuringElement関数は、カーネルを作成する関数である\cite{getStructuringElement関数}。
-カーネルは、ガウシアンフィルタ(GaussianBlur関数で後述)や膨張処理(dilate関数で後述)など、注目画素の周囲の画素値を参照する画像処理において、周囲の画素を行列として、周囲の画素を参照する計算に付ける重みである。
-例えば、3行3列のカーネルは、注目画素とその周囲8画素の画素値の、計9画素の画素値を用いて計算を行う。
+カーネルは、ガウシアンフィルタ(GaussianBlur関数で後述)や膨張処理(dilate関数で後述)など、注目画素の周囲の画素値を参照する画像処理において、周囲の画素値を行列として、その行列を参照する計算に付ける重みである。
+例えば、3行3列の矩形カーネルは、注目画素とその周囲8画素の画素値の、計9画素の画素値を用いて計算を行う。
 第一引数として、カーネルの形状を矩形、楕円、十字から決定する変数を指定する。
 また、第二引数では、カーネルの大きさを指定する。
 なお、本研究では、第一引数を、カーネルの形状を矩形に決定する、MORPH\_RECTを用いる。
@@ -121,7 +121,7 @@ Canny法におけるエッジ検出の閾値処理については、最小閾値
 本研究では、下線部領域座標取得用画像処理(\ref{subsec:image_processing_for_underline_coords_obtainment}節で後述)で下線部領域座標の取得に必要な画像処理の一部として用いる。
 
 \paragraph{findContours関数}
-findContours関数は、画像内にある物体の輪郭を検出する関数である。
+findContours関数は、黒い背景の画像内にある白い物体の輪郭を検出する関数である。
 第一引数として、二値化処理後の画像である二値画像を指定する。
 また、第二引数では、検出する輪郭と、それらを保存する構造を決定する変数を指定する。
 本研究では、全ての輪郭を検出し、それらを外側から順に入れ子とした階層構造とするRECT\_TREEを指定する。
@@ -136,11 +136,9 @@ HoughLinesP関数は、ハフ変換によって画像内にある直線を検出
 直線を検出する場合は、極座標の二次元平面に変換する。
 直線上のある点の座標を$(x, y)$とすると、$\rho$は、座標$(x, y)$を通る直線に対して、原点から垂線を下ろしたときの長さ、$\theta$は、座標$(x, y)$を通る直線に対して、原点から垂線を下ろしたときに、X軸となす角度と表すことができる。
 よって、以下の式が成り立つ。
-
 \begin{equation}\label{eq:hough}
 	\rho = x\cos\theta + y\sin\theta
 \end{equation}
-
 座標$(x, y)$を通る直線は無数に存在するため、式\ref{eq:hough}を満たす$(\rho, \theta)$も無数に存在する。
 縦軸を$\rho$、横軸を$\theta$として、それらの$(\rho, \theta)$を、$\rho$-$\theta$空間に射影すると、曲線を図示できる。
 この座標系の変換を、直線上の他にある$(x, y)$以外の座標に対して行ったとき、$\rho$-$\theta$空間に交点が存在する。
@@ -175,20 +173,20 @@ drawContours関数を用いる際は、引数を以下の順で渡す\cite{輪�
 putText関数は、文字を画像に描画する関数である。
 本研究では、領域強調画像出力処理(\ref{subsec:area_highlighted_image_output_processing}節で後述)で領域とラベルを描画するために用いる。
 
-\section{DeblurGANv2}\label{sec:DeblurGANv2}
-DeblurGANv2は、敵対的生成ネットワーク(Generative Adversarial Network)をブレ除去に適用したツールである\cite{DeblurGANv2}。
-スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
-また、先行研究において、スマートフォンのカメラで撮影した画像に対して、複数の画像処理と共にDeblurGANv2を適用することによって、ブレ除去によって画像品質が向上し、Tesseract-OCR\cite{Tesseract-OCR}を用いた光学文字認識(\ref{sec:Optical-Charactor-Recognition}節で後述)の精度が向上することが示されている\cite{DeblurGANv2の先行研究}。
-
-本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節で後述)と文字情報取得部(\ref{sec:OCR_part}節で後述)で行う画像処理の一部に用いる。
-
 \section{光学文字認識}\label{sec:Optical-Charactor-Recognition}
 光学文字認識(Optical Charactor Recognition)とは、文字を含む画像から文字を識別し、文字コードに変換する処理である\cite{光学文字認識}。
 本研究では、文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節で後述)で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を取得するために用いる。
-また、本研究では、光学文字認識ソフトウェア\cite{光学文字認識ソフトウェア}の1つであるTesseract-OCRを、PythonのOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から用いる。
+また、本研究では、光学文字認識ソフトウェア\cite{光学文字認識ソフトウェア}の1つであるTesseract-OCR\cite{Tesseract-OCR}を、PythonのOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から用いる。
 PyOCRを用いる際に、文字を認識する処理にbuilderという変数を引数として指定できる。
 
 本研究では、変数builderについて、行単位で、文字と、文字を囲むバウンディングボックスの各頂点のxy座標を同時に取得する、LineBoxBuilderを指定する。
+
+\section{DeblurGANv2}\label{sec:DeblurGANv2}
+DeblurGANv2は、敵対的生成ネットワーク(Generative Adversarial Network)をブレ除去に適用したツールである\cite{DeblurGANv2}。
+スマートフォンで帳票画像を撮影する際に発生する画像内のブレを除去し、領域座標と文字認識の精度を高めることを目的として適用する。
+また、先行研究において、スマートフォンのカメラで撮影した画像に対して、複数の画像処理と共にDeblurGANv2を適用することによって、ブレ除去によって画像品質が向上し、Tesseract-OCRを用いた光学文字認識の精度が向上することが示されている\cite{DeblurGANv2の先行研究}。
+
+本研究では、領域取得部(\ref{sec:area_coords_obtainment_part}節で後述)と文字情報取得部(\ref{sec:OCR_part}節で後述)で行う画像処理の一部に用いる。
 
 \section{Fugashi}\label{sec:Fugashi}
 Fugashiは、形態素解析ソフトウェアであるMecab\cite{Mecab}をPythonで使用する際のラッパーライブラリである\cite{Fugashi}。

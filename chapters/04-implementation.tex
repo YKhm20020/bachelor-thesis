@@ -1,5 +1,5 @@
 \chapter{試作したツールの実装}\label{cha:Implementation}
-本研究では、帳票のレイアウトを変更せず、電子フォーム作成にかかる手間と時間を削減することを目的として、記入欄検出およびラベル割付を行い、それらの内容を画像に出力するツールを試作する。
+本研究では、帳票のレイアウトを変更せず、電子フォーム作成にかかる手間と時間を削減することを目的として、記入欄自動検出およびラベル割付ツールを試作する。
 試作するツールは、領域座標取得部、文字情報取得部、ラベル割付部、ファイル出力部の4つの処理部で構成する。
 試作するツールの構成を、図\ref{fig:structure}に示す。
 
@@ -20,7 +20,6 @@
 出力は、文字情報取得部(\ref{sec:OCR_part}節で後述)とラベル割付部(\ref{sec:label_link_part}節で後述)に渡す。
 
 矩形の帳票画像内記入欄については各頂点の4つのxy座標を、下線部の帳票画像内記入欄については両端点の2つのxy座標を、それぞれ領域座標として取得する。
-領域座標取得部の出力結果である領域座標は、ラベル割付部(\ref{subsec:label_link_processing}節で後述)で用いる。
 
 % 矩形
 \subsection{矩形領域座標取得用画像処理}\label{subsec:image_processing_for_rect_coords_obtainment}
@@ -52,7 +51,7 @@
     \item 二値画像への変換\\
         OpenCVのthreshold関数を用いて、大津の二値化による閾値処理を行う。
         閾値の決定手法を指定する変数は、THRESH\_TOZERO\_INVに指定して二値化する。
-        白黒を反転して二値化することにより、複数の矩形が隣接する場合に、それらを囲む矩形を不要に検出してしまうことを防ぐ。
+        これは、findContours関数(\ref{sec:OpenCV}節を参照)が黒い背景にある白い領域の輪郭を検出するためである。
         ブレ除去およびノイズ除去後のグレースケール化帳票画像を受け取り、二値化した帳票画像を出力し、dilate関数(\ref{sec:OpenCV}節を参照)に渡す。
     \item カーネルの作成\\
         getStructuringElement関数(\ref{sec:OpenCV}節を参照)を用いて、5行5列の矩形カーネルを作成する。
@@ -66,12 +65,12 @@
 \end{enumerate}
 
 なお、下線部領域座標取得用画像処理(\ref{subsec:image_processing_for_underline_coords_obtainment}節で後述)で行うエッジ検出は、矩形領域座標取得用画像処理では行わない。
-これは、エッジ検出によって、矩形の辺を境界として、内側と外側に矩形を不要に認識することを防ぐためである。
+これは、矩形の辺を境界として、内側と外側に矩形を認識してしまい、不要に矩形領域を取得することを防ぐためである。
 
 \subsection{矩形領域座標取得処理}\label{subsec:rect_coords_obtainment_processing}
 矩形領域座標取得処理は、膨張処理後の二値化した帳票画像を入力として、矩形の帳票画像内記入欄を検出し、矩形領域座標を取得する処理である。
 矩形領域座標取得用画像処理(\ref{subsec:image_processing_for_rect_coords_obtainment})の膨張処理後の二値画像を入力として、矩形領域座標を出力とする。
-出力は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)、文字情報取得用画像処理(\ref{subsec:image_processing_for_char_recognition}節で後述)、ファイル出力部(\ref{subsec:file_output_part}節で後述)へ渡す。
+出力は、下線部領域座標取得処理(\ref{subsec:underline_coords_obtainment_processing}節で後述)、文字情報取得用画像処理(\ref{subsec:image_processing_for_char_recognition}節で後述)、ラベル割付処理(\ref{subsec:label_link_processing}節で後述)へ渡す。
 
 膨張処理後の二値化した帳票画像に対して、OpenCVのfindContours関数(\ref{sec:OpenCV}節を参照)による輪郭検出を用いて、矩形の帳票画像内記入欄を検出する。
 なお、以下の条件のいずれかに該当する矩形については、除去できなかったノイズを矩形として誤検知した可能性が高いとして、出力の対象外とする。
@@ -152,7 +151,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 \section{文字情報取得部}\label{sec:OCR_part}
 文字情報取得部では、光学文字認識(\ref{sec:Optical-Charactor-Recognition}節を参照)によって、帳票画像内の文字情報を取得する処理部である。
 帳票画像を入力とし、文字情報を出力する。
-出力は、ラベル割付部(\ref{sec:label_link_part}節で後述)とファイル出力部(\ref{subsec:file_output_part}節で後述)に渡す。
+出力は、ラベル割付部(\ref{sec:label_link_part}節で後述)に渡す。
 
 なお、試作するツールでは、光学文字認識ソフトTesseract-OCR\cite{Tesseract-OCR}を用いる。
 
@@ -176,7 +175,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
     \item 背景色のRGB値を取得\\
         背景色は、画像内で占める面積が最も広い色である。
         全画素のRGB値を取得し、最も取得回数が多いRGB値を、背景色のRGB値とする。
-        Numpyのhistogram関数を用いて、各色空間の値について、それぞれのヒストグラムを、ビンの数を256として作成し、3つの最頻値のビンを取得する。
+        Numpyのhistogram関数(\ref{sec:Numpy}節を参照)を用いて、各色空間の値について、それぞれのヒストグラムを、ビンの数を256として作成し、3つの最頻値のビンを取得する。
         各色空間の値は、それぞれ下限が0、上限が255であるため、1単位で各色空間の最頻値を計算する。
         3つの最頻値を組み合わせ、取得する背景色のRGB値を、drawContours関数とline関数に渡す。
     \item 背景色での矩形領域と下線部領域の描画\\
@@ -190,7 +189,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
         背景色で領域を描画した画像を受け取り、背景色で領域を描画したグレースケール化帳票画像の配列を出力する。
         出力する帳票画像の配列は、DeblurGANv2に渡す。   
     \item ブレ除去後の帳票画像の生成\\
-        DeblurGANv2を適用することにより、帳票画像を撮影する際に発生する画像内のブレを除去し、文字認識の精度を高める。
+        DeblurGANv2を適用することにより、帳票画像を撮影する際に発生する画像内のブレを除去し、光学文字認識の精度を高める。
         背景色で領域を描画したグレースケール化帳票画像を受け取り、ブレ除去後の背景色で領域を描画したグレースケール化帳票画像を出力する。
         出力する帳票画像の配列は、drawContours関数(\ref{sec:OpenCV}節を参照)とline関数(\ref{sec:OpenCV}節を参照)に渡す。
     \item 二値画像への変換\\
@@ -200,8 +199,8 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
         出力する帳票画像の配列は、文字情報取得処理に渡す。
 \end{enumerate}
 
-文字認識の精度を高めるため、背景色のRGB値を取得し、その色で矩形領域と下線部領域を描画している。
-これは、大津の二値化によって決定した閾値が、矩形領域の辺上と下線部領域の直線上の画素値を参照し、文字認識の精度が低くなることを防ぐためである。
+光学文字認識の精度を高めるため、背景色のRGB値を取得し、その色で矩形領域と下線部領域を描画している。
+これは、大津の二値化によって決定した閾値が、矩形領域の辺上と下線部領域の直線上の画素値を参照し、光学文字認識の精度が低くなることを防ぐためである。
 \ref{sec:input_images}節で述べたように、背景が白色である帳票を対象としているが、白色であることを示す(255,255,255)のRGB値で領域を描画すると、以下のような問題が発生する。
 
 ある電子化文書の帳票画像のうち、矩形領域の一部を、図\ref{fig:before_background_coloring}に示す。
@@ -210,10 +209,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 これを防ぐため、背景色のRGB値を取得する必要がある。
 
 図\ref{fig:before_background_coloring}に対して、取得した矩形領域を背景色で描画した帳票画像の一部を、図\ref{fig:after_background_coloring}に示す。
-図\ref{fig:before_background_coloring}、および図\ref{fig:after_background_coloring}より、矩形領域座標を参照し、背景色で矩形を描画することで、矩形の帳票画像内記入欄の辺が一部消えていることがわかる。
-これによって、電子化文書の帳票画像を入力とした場合についても、文字以外の黒い画素の数を減らし、大津の二値化によって決定する閾値が文字認識に適した数値となる。
-
-\begin{figure}[ht]
+\begin{figure}[tp]
     \centering
     \begin{minipage}[c]{0.45\linewidth}
         \centering
@@ -228,6 +224,8 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
         \label{fig:after_background_coloring}
     \end{minipage}
 \end{figure}
+図\ref{fig:before_background_coloring}、および図\ref{fig:after_background_coloring}より、矩形領域座標を参照し、背景色で矩形を描画することで、矩形の帳票画像内記入欄の辺が一部消えていることがわかる。
+これによって、電子化文書の帳票画像を入力とした場合についても、文字以外の黒い画素の数を減らし、大津の二値化によって決定する閾値が光学文字認識に適した数値となる。
 
 \subsection{文字情報取得処理}\label{subsec:char_information_obtainment_processing}
 文字情報取得処理は、光学文字認識ソフトTesseract-OCRを用いて、文字情報を取得する処理である。
@@ -236,7 +234,7 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
 
 試作するツールでは、PythonのOCR用のラッパーライブラリであるPyOCR\cite{PyOCR}から、Tesseract-OCRによる文字認識を行う。
 このとき、変数builderにLineBoxBuilderを指定し、行単位で文字情報を取得する。
-取得文字と文字位置を行単位で取得することによって、単語ごとに文字認識の結果を得るため、属性推測処理において、属性推測の処理時間が長くなることと、不正確な属性の推測とすることを防ぐ。
+取得文字と文字位置を行単位で取得することによって、単語ごとに光学文字認識の結果を得るため、属性推測処理において、属性推測の処理時間が長くなることと、不正確な属性の推測とすることを防ぐ。
 
 例えば、「日数」という文字を認識した場合、正しい属性は数値(number)である。
 しかし、この文字を「日」、「数」と一文字ずつ認識した場合、後述する属性推測処理において、それぞれ日付(data)、数値(number)と属性を推測してしまう。
@@ -249,7 +247,7 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 しかし、人間の目視で複数の文字が同じ行に存在すると認識するとき、割り振った番号を参照すると、昇順にならない不具合が発生する場合がある。
 ラベル割付部(\ref{subsec:label_link_processing}節で後述)で文字位置を扱う際に、この不具合が起こった場合、ラベルの更新順が変化することで、異なるラベルを領域座標に割り付ける可能性がある。
 
-ある帳票画像に対して文字位置取得処理を施し、同行に存在する文字列に対して、割り振った番号が昇順にならない場合の画像を、図\ref{fig:before_sorted_string}に示す。
+ある帳票画像に対して文字位置取得処理を行い、同じ行に存在する文字列に対して割り振った番号が昇順にならない場合の画像を、図\ref{fig:before_sorted_string}に示す。
 図\ref{fig:before_sorted_string}内で描画している赤い矩形は、取得文字を囲むバウンディングボックスであり、バウンディングボックスの左上に、ソート後に割り振った番号を表示している。
 図\ref{fig:before_sorted_string}の上部の文字に対して割り振った番号は、左から14番、15番、13番、12番となっている。
 本来は、割り振った番号が左から12番、13番、14番、15番となる必要がある。
@@ -271,7 +269,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 
 この処理によって、同じ行に存在する複数の文字を対象に、文字位置取得時点のy座標について、最小のy座標と最大のy座標の差が10ピクセル以内であれば、正しくソートができる。
 再ソート後にバウンディングボックスを描画した画像を、図\ref{fig:after_sorted_string}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -281,7 +278,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         \label{fig:before_sorted_string}
     \end{center}
 \end{figure}
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -291,27 +287,9 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         \label{fig:after_sorted_string}
     \end{center}
 \end{figure}
-
 ソート後は、図\ref{fig:before_sorted_string}では不具合が発生していた箇所が、図\ref{fig:after_sorted_string}では、左から12番、13番、14番、15番となっており、昇順となっていることがわかる。
 
 図\ref{fig:original}に示した帳票画像に対する、文字情報取得処理の出力をまとめたものを、図\ref{fig:char_recognition_for_original}に示す。
-また、図\ref{fig:char_recognition_for_original}で表す形式を、以下に示す。
-
-\begin{center}
-    string[A]: ((B, C), (D, E)) : (F)
-\end{center}
-
-\begin{center}
-    \begin{tabular}{l}
-    A: ソート後の番号\\  
-    B: バウンディングボックスの左上頂点のx座標\\
-    C: バウンディングボックスの左上頂点のy座標\\  
-    D: バウンディングボックスの右下頂点のx座標\\
-    E: バウンディングボックスの右下頂点のy座標\\
-    F: 取得文字\\
-    \end{tabular}
-\end{center}
-
 \lstset{language=}
 \begin{figure}[tp]
     \begin{lstlisting}
@@ -338,9 +316,40 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
     \caption{図\ref{fig:original}から取得した文字}
     \label{fig:char_recognition_for_original}
 \end{figure}
+また、図\ref{fig:char_recognition_for_original}で表す形式を、図\ref{fig:format_char}に示す。
+% \begin{center}
+%     string[A]: ((B, C), (D, E)) : (F)
+% \end{center}
 
+% \begin{center}
+%     \begin{tabular}{l}
+%     A: ソート後の番号\\  
+%     B: バウンディングボックスの左上頂点のx座標\\
+%     C: バウンディングボックスの左上頂点のy座標\\  
+%     D: バウンディングボックスの右下頂点のx座標\\
+%     E: バウンディングボックスの右下頂点のy座標\\
+%     F: 取得文字\\
+%     \end{tabular}
+% \end{center}
+\begin{figure}[tp]
+    \begin{center}
+        string[A]: ((B, C), (D, E)) : (F)
+    \end{center}
+
+    \begin{center}
+        \begin{tabular}{l}
+        A: ソート後の番号\\  
+        B: バウンディングボックスの左上頂点のx座標\\
+        C: バウンディングボックスの左上頂点のy座標\\  
+        D: バウンディングボックスの右下頂点のx座標\\
+        E: バウンディングボックスの右下頂点のy座標\\
+        F: 取得文字\\
+        \end{tabular}
+    \end{center}
+    \caption{図\ref{fig:char_recognition_for_original}で取得文字を表示する形式}
+    \label{fig:format_char}
+\end{figure}
 図\ref{fig:char_recognition_for_original}で示す文字位置を参照し、バウンディングボックスを描画した画像を、図\ref{fig:bbox_recognition_for_original}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -350,7 +359,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         \label{fig:bbox_recognition_for_original}
     \end{center}
 \end{figure}
-
 例えば、番号1の取得文字は、「請求日」であり、バウンディングボックスの左上頂点のxy座標が(1597, 321)、バウンディングボックスの右下頂点のxy座標が(1724, 363)となっている。
 図\ref{fig:char_recognition_for_original}中の番号は、図\ref{fig:bbox_recognition_for_original}のバウンディングボックスの左上に表示する番号と一致する。
 
@@ -358,17 +366,17 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 認識に失敗した文字が及ぼす影響については、\ref{sec:problems}節で後述する。
 
 \subsection{除外判定処理}\label{subsec:exclusion_judgement_processing}
-除外判定処理は、属性推測処理(\ref{subsec:att_prediction_processing}節で後述)に不要な文字情報について、出力から除外する処理である。
+除外判定処理は、属性推測処理(\ref{subsec:att_prediction_processing}節で後述)に不要な文字情報を除外し、出力する処理である。
 文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節を参照)の文字情報を入力とし、除外判定処理後の文字情報を出力する。
 出力は、属性推測処理(\ref{subsec:att_prediction_processing}節で後述)とラベル割付処理(\ref{subsec:label_link_processing}節で後述)に渡す。
 
 形態素解析ソフトウェアであるFugashiを用いて、取得文字を形態素に分割し、品詞を解析する。
-取得文字を構成する形態素の数のうち、特定の品詞である形態素の数の割合が半分以上である場合は、属性推測処理において意味がない取得文字であるとして、該当の取得文字と文字位置を、文字情報から除外する。
+取得文字を構成する形態素の数のうち、特定の品詞である形態素の数の割合が半分以上である場合は、属性推測処理において意味がない取得文字であるとして、該当の文字情報を除外する。
 文字を認識する際に、紙面と背景の境界や、領域取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得できなかった矩形や直線を、文字として誤認識する場合がある。
 不要な文字の属性推測処理を防ぐことにより、処理時間を短縮することができる。
 
 以下に、UniDic品詞体系(左からカンマ区切りで、大分類、中分類、小分類、細分類)に基づき、除外対象である形態素の品詞を示す。
-分類が"*"となっている場合は、該当する分類がないことを示す。
+分類が``*"となっている場合は、該当する分類がないことを示す。
 なお、除外対象とする品詞は、経験から決定している。
 
 \begin{itemize}
@@ -379,7 +387,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 
 ある帳票画像に対して、\ref{subsec:char_information_obtainment_processing}節で取得したバウンディングボックスを描画した画像の一部を、図\ref{fig:before_exclusion_bbox}に示す。
 また、図\ref{fig:before_exclusion_bbox}で描画したバウンディングボックスに対応する取得文字を出力した画像を、図\ref{fig:before_exclusion_string}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \fbox{
@@ -389,12 +396,10 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         \label{fig:before_exclusion_bbox}
     \end{center}
 \end{figure}
-
 図\ref{fig:before_exclusion_bbox}と図\ref{fig:before_exclusion_string}の58番および60番の取得文字は、帳票画像内の矩形の辺を誤って文字として認識している。
 この矩形については、矩形領域座標取得処理(\ref{subsec:rect_coords_obtainment_processing}節を参照)で取得できなかったため、背景色の矩形を描画できていない。
 図\ref{fig:before_exclusion_bbox}と図\ref{fig:before_exclusion_string}の58番および60番の取得文字は、属性推測処理において意味がない文字である。
 図\ref{fig:before_exclusion_string}に示した取得文字に対して除外判定処理を実行し、属性推測処理に不要な取得文字を除外した出力を、図\ref{fig:after_exclusion_string}に示す。
-
 \begin{figure}[tp]
     \begin{center}
         \includegraphics[width=15cm]{image/04-implementation/before_exclusion_string.png}
@@ -402,7 +407,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         \label{fig:before_exclusion_string}
     \end{center}
 \end{figure}
-
 \begin{figure}[tp]
     \begin{center}
         \includegraphics[width=15cm]{image/04-implementation/after_exclusion_string.png}
@@ -410,7 +414,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         \label{fig:after_exclusion_string}
     \end{center}
 \end{figure}
-
 図\ref{fig:after_exclusion_string}より、除外判定処理によって、属性推測処理に不要な取得文字の除外できたことがわかる。
 
 \section{ラベル割付部}\label{sec:label_link_part}
@@ -430,22 +433,23 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 使用する大規模言語モデルをYouriに選定した理由を、以下に示す。
 
 \begin{itemize}
-    \item ローカルで推論が可能である\\
-        帳票画像の文字をプロンプトとして入力するため、帳票画像内の情報が流出する可能性がある。
-        帳票には、機密情報や個人情報を含む可能性があるため、情報流出の危険がないよう、
+    \item ローカル環境で推論が可能である\\
+        属性推測処理では、帳票画像の文字をプロンプトとして入力する。
+        APIを介してプロンプトを外部に送信する場合、帳票画像内に記載された内容が流出する可能性がある。
+        帳票には、機密情報や個人情報を含む可能性があるため、ローカル環境で処理を完結する。
     \item 日本語の推論に特化している\\
         Youriは、rinna社が公開した、Llama2に対して日本語の学習データで継続事前学習を行った、大規模言語モデルである。
-        よって、日本語の推論に特化しており、推測する属性の精度が高いため。
-    \item 軽量であり、高速に推論できる\\
-        YouriはAPIを利用しない他の言語モデルと比較して、高速である。
+        日本語の推論に特化しており、推測する属性の精度が高い。
+    \item 軽量であり、高速に属性を推測できる\\
+        YouriはAPIを介さない他の言語モデルと比較して、高速である。
         属性推測処理では、取得した文字の回数だけYouriにプロンプトを入力し、返答を待つ必要がある。
-        属性推測処理が終わるまでにかかる時間に対して、大きな影響があるため、属性の推測にかかる時間が短いモデルを選定する必要がある。
+        属性の推測にかかる時間が短いモデルを選定することで、属性の推測にかかる時間を短縮する。
 \end{itemize}
 
 大規模言語モデルは、指示と異なる出力をする場合がある。
-そのため、示した3つの属性以外の出力をする場合がある。
+そのため、示した3つの属性以外を出力する場合がある。
 日付(date)、文字列(string)、数値(number)以外の属性の推測を防ぐため、Youriの出力から3つの属性のいずれかとなるよう補正を行う。
-日本語の推論に特化した言語モデルを利用することによって、取得した日本語の文字に対して、属性をより正確に推測することができる。
+日本語の推論に特化した言語モデルを利用することによって、取得した日本語の文字に対して、属性をより正確に推測できる。
 
 属性推測処理の流れを、以下に示す。
 以下の処理は、文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節を参照)でソートを行った順番で、除外判定処理後の取得文字の数だけ繰り返す。
@@ -455,16 +459,17 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 \begin{enumerate}
     \item 除外判定処理(\ref{subsec:exclusion_judgement_processing}節を参照)の出力である除外判定後の取得文字を受け取る。
     \item 図\ref{fig:prompt_struct_for_attribute_prediction}に示すプロンプトをYouriに入力し、属性を推測する。
-    \item 以下の順でYouriの返答に対して処理を行い、属性を補正する。
+    \item \label{enum:Youri_output}Youriの出力を受けとる。
+    \item 以下の順で、\ref{enum:Youri_output}.で受け取ったYouriの出力に対して処理を行い、属性を補正する。
         \begin{enumerate}
             \item 全文字の属性を文字列(string)とする。
             \item 出力に「日」を含む場合は、日付(date)として判定し、属性を文字列(string)から更新し、属性を補正する。
             \item 出力に「数」を含む場合は、数値(number)として判定し、属性を文字列(string)から更新し、属性を補正する。
-            \item 出力に「日」、「数」を含まない場合は、属性を更新せず、文字列(string)とする。
+            \item 出力に「日」、「数」を含まない場合は、属性を更新せず、文字列(string)のままとする。
         \end{enumerate}
 \end{enumerate}
 
-\begin{figure}[hp]
+\begin{figure}[tp]
     \setbox0\vbox{
         \vbox{\# 命令書:}
         \vbox{以下の制約条件にあてはまるものを出力せよ。}
@@ -480,11 +485,8 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 \end{figure}
 
 図\ref{fig:char_recognition_for_original}に示した取得文字に対して、Youriが出力したテキストの一部を、以下の図\ref{fig:output_Youri}に示す。
-図\ref{fig:output_Youri}は、Youriの出力のうち、左にYouriの返答を、右の括弧内に取得文字を示す。
-図\ref{fig:output_Youri}の1行目や3行目は、「番号」、「詩」という取得文字に対して、文を出力している。
-
 \lstset{language=}
-\begin{figure}[t]
+\begin{figure}[tp]
     \begin{lstlisting}
         数値に該当する。 (番号)
         日付 (請求日)
@@ -509,30 +511,12 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
     \caption{図\ref{fig:char_recognition_for_original}に示した取得文字からYouriが出力したテキスト}
     \label{fig:output_Youri}
 \end{figure}
+図\ref{fig:output_Youri}は、Youriの出力のうち、左にYouriの返答を、右の括弧内に取得文字を示す。
+図\ref{fig:output_Youri}の1行目や3行目は、「番号」、「詩」という取得文字に対して、文を出力している。
 
 図\ref{fig:output_Youri}で示したYouriの出力から、属性を補正した結果を、図\ref{fig:predict_att_for_original}に示す。
-また、図\ref{fig:predict_att_for_original}で表す形式を、以下に示す。
-
-\begin{center}
-    att[A]: B (C)
-\end{center}
-
-\begin{center}
-    \begin{tabular}{l}
-        A: ソート後のインデックス\\
-        B: 属性を推測した結果\\
-        C: 推測対象である取得文字\\
-    \end{tabular}
-\end{center}
-
-例えば、番号1の取得文字は、「請求日」であり、推測した属性は日付(date)となる。番号4の取得文字は、「月」であり、推測した属性は文字列(string)となる。
-図\ref{fig:predict_att_for_original}の番号は、図\ref{fig:bbox_recognition_for_original}のバウンディングボックスの左上頂点に表示する番号、および図\ref{fig:char_recognition_for_original}で示した番号と一致する。
-なお、大規模言語モデルによる出力に依存して属性を決定するため、常に正しい属性を推測することはできていない。
-例えば、番号6の取得文字である「御中」の属性を、日付(date)と推測している。
-御中は組織や団体の敬称であり、本来は文字列(string)の属性が正しい。
-
 \lstset{language=}
-\begin{figure}[t]
+\begin{figure}[tp]
     \begin{lstlisting}
         att[0]: number (番号)
         att[1]: date (請求日)
@@ -554,15 +538,35 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         att[17]: number (合計)
         att[18]: string (備考)
     \end{lstlisting}
-    \caption{図\ref{fig:original}に対して取得した文字情報}
+    \caption{図\ref{fig:output_Youri}のYouriの出力から補正した属性を属性した結果}
     \label{fig:predict_att_for_original}
 \end{figure}
+また、図\ref{fig:predict_att_for_original}で表す形式を、図\ref{fig:format_att}に示す。
+\begin{figure}[tp]
+    \begin{center}
+        att[A]: B (C)
+    \end{center}
+
+    \begin{center}
+        \begin{tabular}{l}
+            A: ソート後のインデックス\\
+            B: 属性を推測した結果\\
+            C: 推測対象である取得文字\\
+        \end{tabular}
+    \end{center}
+    \caption{図\ref{fig:predict_att_for_original}で属性を表示する形式}
+    \label{fig:format_att}
+\end{figure}
+例えば、1番の取得文字は、「請求日」であり、推測した属性は日付(date)となる。4番の取得文字は、「月」であり、推測した属性は文字列(string)となる。
+図\ref{fig:predict_att_for_original}の番号は、図\ref{fig:bbox_recognition_for_original}のバウンディングボックスの左上頂点に表示する番号、および図\ref{fig:char_recognition_for_original}で示した番号と一致する。
+なお、大規模言語モデルによる出力に依存して属性を決定するため、常に正しい属性を推測することはできていない。
+例えば、6番の取得文字である「御中」の属性を、日付(date)と推測している。
+御中は組織や団体の敬称であり、本来は文字列(string)の属性が正しい。
 
 \subsection{ラベル割付処理}\label{subsec:label_link_processing}
 ラベル割付処理では、取得した領域座標に対して、近傍に存在する文字の属性を割り付ける。
 領域座標取得部(\ref{sec:area_coords_obtainment_part}節を参照)の領域座標、属性推測処理(\ref{subsec:att_prediction_processing}節を参照)の属性と文字列を入力とし、領域座標とそのラベルを出力する。
 出力は、JSONファイル出力処理(\ref{subsec:json_file_output_processing}節で後述)と領域強調画像出力処理(\ref{subsec:area_highlighted_image_output_processing}節で後述)に渡す。
-
 
 ラベル割付処理の流れを、以下に示す。
 以下の処理は、文字位置取得処理でソートを行った順番で、除外判定処理(\ref{subsec:exclusion_judgement_processing}節を参照)後の取得文字の数だけ繰り返す。
@@ -610,19 +614,18 @@ JSONファイル出力処理は、取得した領域座標とラベルを整形�
 以下に、矩形と直線を、割り付けたラベルと共に描画した画像を出力する流れを示す。
 
 \begin{enumerate}
-    \item \ref{sec:area_coords_obtainment_part}節と\ref{subsec:label_link_processing}節から、領域座標と、領域座標に対応するラベルを、それぞれ取得する。
+    \item ラベル割付処理(\ref{subsec:label_link_processing}節を参照)から、領域座標と、領域座標に対応するラベルを、それぞれ取得する。
     \item Pythonのcopy関数により、入力である帳票画像をコピーし、2枚の帳票画像A、Bを生成する。
-    \item \label{enum:randint}Numpy(\ref{sec:Numpy}節を参照)のrandint関数を用いて、3つのランダムな整数値を生成し、それぞれをR、G、Bの値とすることで、ランダムなRGBカラーを決定する。
-    \item 帳票画像Aに対して、OpenCVのdrawContours関数と\ref{enum:randint}で生成したRGBカラーを用いて、矩形領域座標を参照して矩形を描画する。
+    \item \label{enum:randint}Numpy(\ref{sec:Numpy}節を参照)のrandint関数を用いて、3つのランダムな整数値を生成し、それぞれを各色空間の値とすることで、ランダムなRGBカラーを決定する。
+    \item 帳票画像Aに対して、OpenCVのdrawContours関数と\ref{enum:randint}.で生成したRGBカラーを用いて、矩形領域座標を参照して矩形を描画する。
     \item 帳票画像Bに対して、OpenCVのline関数を用いて、下線部領域座標を参照して直線を描画する。
     \item OpenCVのputText関数(\ref{sec:OpenCV}節を参照)を用いて、idキーの値と、labelキーの値を、各領域座標の左上に描画する。
     \item OpenCVのimwrite関数を用いて、帳票画像Aと帳票画像Bを、それぞれ矩形領域強調画像と下線部領域強調画像として保存する。
 \end{enumerate}
 
 以上の処理後、矩形領域強調画像と、下線部領域強調画像を出力する。
-ある帳票画像に対して、試作したツールを適用し、出力した矩形領域強調画像と、下線部領域強調画像を、それぞれ以下の図\ref{fig:img_rect_labels}と図\ref{fig:img_underline_labels}に示す。
-
-\begin{figure}[t]
+ある帳票画像に対して、試作したツールを適用し、出力した矩形領域強調画像と、下線部領域強調画像を、それぞれ図\ref{fig:img_rect_labels}と図\ref{fig:img_underline_labels}に示す。
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/04-implementation/img_rect_labels.png}
@@ -631,8 +634,7 @@ JSONファイル出力処理は、取得した領域座標とラベルを整形�
         \label{fig:img_rect_labels}
     \end{center}
 \end{figure}
-
-\begin{figure}[t]
+\begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/04-implementation/img_underline_labels.png}
