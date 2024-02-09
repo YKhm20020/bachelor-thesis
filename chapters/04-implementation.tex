@@ -1,5 +1,5 @@
 \chapter{試作したツールの実装}\label{cha:Implementation}
-本研究では、帳票のレイアウトを保持したまま、電子フォーム作成にかかる時間を削減することを目的として、記入欄自動検出およびラベル割付機能を持つツールを試作する。
+本研究では、帳票のレイアウトを保持したまま変更せず、電子フォーム作成にかかる時間を削減することを目的として、記入欄自動検出およびラベル割付機能を持つツールを試作する。
 試作するツールは、領域座標取得部、文字情報取得部、ラベル割付部、ファイル出力部の4つの処理部で構成する。
 試作するツールの構成を、図\ref{fig:structure}に示す。
 
@@ -199,27 +199,28 @@ HoughLinesP関数によって直線を検出する際、入力画像内にある
         出力する帳票画像の配列は、文字情報取得処理に渡す。
 \end{enumerate}
 
-上記の処理\ref{enum:background_RGB}.において、背景色のRGB値を取得し、その色で矩形領域と下線部領域を描画することによって、光学文字認識の精度を高める。
-\ref{sec:input_images}節で述べたように、背景が白色である帳票を対象としているが、白色であることを示す(255,255,255)のRGB値で領域を描画すると、光学文字認識の精度が低くなる問題が発生する。
+上記の処理\ref{enum:background_RGB}.において、背景色のRGB値を取得する理由は、光学文字認識の精度を高めるためである。
+\ref{sec:input_images}節で述べたように、試作するツールは、背景が白色である帳票を入力の対象としているが、白色であることを示す(255,255,255)のRGB値で領域を描画すると、光学文字認識の精度が低くなる問題が発生する。
+この問題に対処するために、取得した背景色のRGB値を用いて、矩形領域と下線部領域を描画する。
 
 ある電子化文書の帳票画像のうち、矩形領域の一部を、図\ref{fig:before_background_coloring}に示す。
 図\ref{fig:before_background_coloring}の元である電子文書の帳票画像は、背景色は完全な白色だった。
 しかし、帳票画像を印刷し、カメラで撮影したことによって、印刷用紙の色と撮影する照明の影響により、やや黄色に変化している。
 これによって、電子化文書の帳票画像を入力とした場合に、白色で取得した領域を描画することによって、二値化の閾値が変化してしまう。
-これを防ぐため、背景色のRGB値を取得する必要がある。
+これを防ぐため、背景色のRGB値を取得する。
 
 図\ref{fig:before_background_coloring}に対して、取得した矩形領域を背景色で描画した帳票画像の一部を、図\ref{fig:after_background_coloring}に示す。
 \begin{figure}[tp]
     \centering
     \begin{minipage}[c]{0.45\linewidth}
         \centering
-        \includegraphics[keepaspectratio, width=7cm]{image/04-implementation/before_background_coloring.jpg}
+        \includegraphics[width=7cm, height=5cm]{image/04-implementation/before_background_coloring.jpg}
         \caption{ある電子化文書の帳票画像における矩形領域の一部}
         \label{fig:before_background_coloring}
     \end{minipage}
     \begin{minipage}[c]{0.45\linewidth}
         \centering
-        \includegraphics[keepaspectratio, width=7cm]{image/04-implementation/after_background_coloring.png}
+        \includegraphics[width=7cm, height=5cm]{image/04-implementation/after_background_coloring.png}
         \caption{図\ref{fig:before_background_coloring}の矩形領域を背景色で描画した画像}
         \label{fig:after_background_coloring}
     \end{minipage}
@@ -290,20 +291,6 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 ソート後は、図\ref{fig:before_sorted_string}では不具合が発生していた箇所が、図\ref{fig:after_sorted_string}では、左から12番、13番、14番、15番となっており、昇順となっていることがわかる。
 
 文字情報取得処理の出力形式を、図\ref{fig:format_char}に示す。
-% \begin{center}
-%     string[A]: ((B, C), (D, E)) : (F)
-% \end{center}
-
-% \begin{center}
-%     \begin{tabular}{l}
-%     A: ソート後の番号\\  
-%     B: バウンディングボックスの左上頂点のx座標\\
-%     C: バウンディングボックスの左上頂点のy座標\\  
-%     D: バウンディングボックスの右下頂点のx座標\\
-%     E: バウンディングボックスの右下頂点のy座標\\
-%     F: 取得文字\\
-%     \end{tabular}
-% \end{center}
 \begin{figure}[tp]
     \begin{center}
         string[A]: ((B, C), (D, E)) : (F)
@@ -319,11 +306,10 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
         F: 取得文字\\
         \end{tabular}
     \end{center}
-    \caption{取得した文字情報を表示する形式}
+    \caption{文字情報取得処理の出力形式}
     \label{fig:format_char}
 \end{figure}
-
-図\ref{fig:format_char}で示した形式で、図\ref{fig:original}に示した帳票画像に対する、文字情報取得処理の出力をまとめたものを、図\ref{fig:char_recognition_for_original}に示す。
+また、図\ref{fig:format_char}で示した形式で、図\ref{fig:original}に示した帳票画像に対する、文字情報取得処理の出力をまとめたものを、図\ref{fig:char_recognition_for_original}に示す。
 \lstset{language=}
 \begin{figure}[tp]
     \begin{lstlisting}
@@ -372,7 +358,7 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 文字情報取得処理(\ref{subsec:char_information_obtainment_processing}節を参照)の文字情報を入力とし、除外判定処理後の文字情報を出力する。
 出力は、属性推測処理とラベル割付処理(\ref{subsec:label_link_processing}節で後述)に渡す。
 
-形態素解析ソフトウェアであるFugashiを用いて、取得文字を形態素に分割し、品詞を解析する。
+形態素解析ソフトウェアであるFugashi(\ref{sec:Fugashi}節を参照)を用いて、取得文字を形態素に分割し、品詞を解析する。
 取得文字を構成する形態素の数のうち、特定の品詞である形態素の数の割合が半分以上である場合は、属性推測処理において意味がない取得文字であるとして、該当の文字情報を除外する。
 文字を認識する際に、紙面と背景の境界や、領域取得部(\ref{sec:area_coords_obtainment_part}節を参照)で取得できなかった矩形や直線を、文字として誤認識する場合がある。
 不要な文字の属性推測処理を防ぐことにより、処理時間を短縮することができる。
@@ -503,7 +489,7 @@ y座標が同じ場合は、さらにx座標について、昇順にソートす
 図\ref{fig:output_Youri}は、Youriの出力のうち、左にYouriの返答を、右の括弧内に取得文字を示す。
 図\ref{fig:output_Youri}の1行目や3行目は、「番号」、「詩」という取得文字に対して、文を出力している。
 
-Youriの出力から、属性を補正した結果を表す形式を、図\ref{fig:format_att}に示す。
+Youriの出力から、属性を補正した結果の出力形式を、図\ref{fig:format_att}に示す。
 \begin{figure}[tp]
     \begin{center}
         att[A]: B (C)
@@ -516,10 +502,10 @@ Youriの出力から、属性を補正した結果を表す形式を、図\ref{f
             C: 推測対象である取得文字\\
         \end{tabular}
     \end{center}
-    \caption{属性を表示する形式}
+    \caption{属性を補正した結果の出力形式}
     \label{fig:format_att}
 \end{figure}
-図\ref{fig:format_att}に示した形式で、図\ref{fig:output_Youri}のYouriの出力から属性を補正した結果を、図\ref{fig:predict_att_for_original}に示す。
+また、図\ref{fig:format_att}に示した形式で、図\ref{fig:output_Youri}のYouriの出力から属性を補正した結果を、図\ref{fig:predict_att_for_original}に示す。
 \lstset{language=}
 \begin{figure}[tp]
     \begin{lstlisting}
@@ -623,13 +609,13 @@ JSONファイル出力処理は、取得した領域座標とラベルを整形�
 \end{enumerate}
 
 以上の処理後、矩形領域強調画像と、下線部領域強調画像を出力する。
-ある帳票画像に対して、試作したツールを適用し、出力した矩形領域強調画像を図\ref{fig:img_rect_labels}に、下線部領域強調画像を図\ref{fig:img_underline_labels}に、それぞれ示す。
+図\ref{fig:original}に示した帳票画像に対して、試作したツールを適用し、出力した矩形領域強調画像を図\ref{fig:img_rect_labels}に、下線部領域強調画像を図\ref{fig:img_underline_labels}に、それぞれ示す。
 \begin{figure}[tp]
     \begin{center}
         \fbox{
             \includegraphics[width=15cm]{image/04-implementation/img_rect_labels.png}
         }
-        \caption{ある帳票画像に対して出力した矩形領域強調画像}
+        \caption{図\ref{fig:original}の帳票画像に対して出力した矩形領域強調画像}
         \label{fig:img_rect_labels}
     \end{center}
 \end{figure}
@@ -638,7 +624,7 @@ JSONファイル出力処理は、取得した領域座標とラベルを整形�
         \fbox{
             \includegraphics[width=15cm]{image/04-implementation/img_underline_labels.png}
         }
-        \caption{ある帳票画像に対して出力した下線部領域強調画像}
+        \caption{図\ref{fig:original}の帳票画像に対して出力した下線部領域強調画像}
         \label{fig:img_underline_labels}
     \end{center}
 \end{figure}
